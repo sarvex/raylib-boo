@@ -57,7 +57,7 @@ CloseWindow()
 
 ### Changes from raylib
 
-As Boo have different syntax of .NET languages, There are some changes applicates to the bindings:
+As Boo have different syntax unlike other .NET languages in some concepts, There are some changes applicates to the bindings:
 
 1. Structs members have underscore before their name (It's not optional in Boo but that's to not conflict with constructors):
 
