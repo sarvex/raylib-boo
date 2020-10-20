@@ -1,7 +1,6 @@
 // Written by Rabia Alhaffar in 17/October/2020
 // raylib-boo, Single file Boo bindings for raylib library
-// TODO: complete raymath bindings...
-// Updated: 19/October/2020
+// Updated: 20/October/2020
 namespace raylib_boo
 import System
 import System.Runtime.InteropServices
