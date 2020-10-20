@@ -53,7 +53,7 @@ CloseWindow()
 
 2. Compile with `booc smallgame.boo` to executable and run it...
 
-> NOTE: You can also check `core_basic_window` example provided with the repo!
+> NOTE: You can also check [`core_basic_window`](https://github.com/Rabios/raylib-boo/blob/master/core_basic_window.boo) example provided with the repo!
 
 ### Changes from raylib
 
