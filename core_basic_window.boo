@@ -27,7 +27,7 @@ import raylib_boo
 screenWidth as int = 800
 screenHeight as int = 450
 
-InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window")
 
 SetTargetFPS(60)                    // Set our game to run at 60 frames-per-second
 //--------------------------------------------------------------------------------------
@@ -38,8 +38,7 @@ while not WindowShouldClose():      // Detect window close button or ESC key
 	//----------------------------------------------------------------------------------
 	// TODO: Update your variables here
 	//----------------------------------------------------------------------------------
-    
-
+	
 	// Draw
 	//----------------------------------------------------------------------------------
 	BeginDrawing()
