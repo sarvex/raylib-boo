@@ -88,4 +88,4 @@ If you face any bugs or you have suggestion, Create issue [here](https://github.
 
 ### License
 
-See [LICENSE.txt](https://github.com/Rabios/raylib-boo/blob/master/LICENSE.txt) for license of bindings and [LICENSES.txt](https://github.com/Rabios/raylib-boo/blob/master/LICENSES.txt) for third party licenses.
+See [`LICENSE.txt`](https://github.com/Rabios/raylib-boo/blob/master/LICENSE.txt) for license of bindings and [`LICENSES.txt`](https://github.com/Rabios/raylib-boo/blob/master/LICENSES.txt) for third party licenses.
