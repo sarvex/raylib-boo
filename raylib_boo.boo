@@ -1,5 +1,5 @@
 // Written by Rabia Alhaffar in 17/October/2020
-// raylib-boo, Single-file Boo bindings for raylib library!
+// raylib-boo, Single-file Boo bindings for raylib!
 // Updated: 20/October/2020
 namespace raylib_boo
 import System
