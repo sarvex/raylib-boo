@@ -1,6 +1,6 @@
 <div align="center">
 	<img src="raylib-boo.png" width="256", height="256"><br>
-	<p><a href="http://boo-language.github.io/">Single-file Boo </a>bindings for <a href="https://www.raylib.com">raylib</a></p>
+	<p>Single-file <a href="http://boo-language.github.io/">Boo </a>bindings for <a href="https://www.raylib.com">raylib</a></p>
 </div>
 <br>
 
