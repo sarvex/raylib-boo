@@ -1,5 +1,5 @@
 // Written by Rabia Alhaffar in 17/October/2020
-// raylib-boo, Single-file Boo bindings for raylib!
+// raylib-boo, Single-file Boo bindings for raylib library!
 // Updated: 20/October/2020
 namespace raylib_boo
 import System
@@ -3696,10 +3696,12 @@ def rlUnloadMesh(mesh as Mesh):
 // raymath
 //------------------------------------------------------------------------------------
 // NOTE: Helper types to be used instead of array return types for *ToFloat functions
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct float3:
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 3)]
 	_v as (single)
 
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct float16:
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 16)]
 	_v as (single)
