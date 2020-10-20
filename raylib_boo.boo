@@ -4124,10 +4124,12 @@ def QuaternionTransform(q as Quaternion, mat as Matrix) as Quaternion:
 	pass
 
 // Return float vector for Matrix
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 def MatrixToFloat(mat as Matrix) as (single):
 	return MatrixToFloatV(mat)._v
 
 // Return float vector for Vector3
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 def Vector3ToFloat(vec as Vector3) as (single):
 	return Vector3ToFloatV(vec)._v
 
