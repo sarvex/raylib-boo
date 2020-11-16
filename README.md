@@ -39,13 +39,13 @@ while not WindowShouldClose():
 	ClearBackground(RAYWHITE())
 	DrawRectangleRec(player, BLUE())
 	if IsKeyDown(KeyboardKey.KEY_W) or IsKeyDown(KeyboardKey.KEY_UP):
-		player._y -= 5
+		player.y -= 5
 	if IsKeyDown(KeyboardKey.KEY_S) or IsKeyDown(KeyboardKey.KEY_DOWN):
-		player._y += 5
+		player.y += 5
 	if IsKeyDown(KeyboardKey.KEY_A) or IsKeyDown(KeyboardKey.KEY_LEFT):
-		player._x -= 5
+		player.x -= 5
 	if IsKeyDown(KeyboardKey.KEY_D) or IsKeyDown(KeyboardKey.KEY_RIGHT):
-		player._x += 5
+		player.x += 5
 	EndDrawing()
 
 CloseWindow()
@@ -59,20 +59,13 @@ CloseWindow()
 
 As Boo have different syntax unlike other .NET languages in some concepts, There are some changes applicates to the bindings:
 
-1. Structs members have underscore before their name (It's not optional in Boo but that's to not conflict with constructors):
-
-```boo
-pos2d as Vector2
-print pos2d._x  // Instead of pos2d.x
-```
-
-2. Constants and defined colors are functions, Sorry but due to boo have problem with locals...
+1. Constants and defined colors are functions...
 
 ```boo
 DrawText("Hi!", 100, 100, 20, BLUE())
 ```
 
-3. Enums works like objects...
+2. Enums works like objects/classes...
 
 ```boo
 // Instead of KEY_A use KeyboardKey.KEY_A
@@ -80,7 +73,7 @@ if IsKeyDown(KeyboardKey.KEY_A):
 	DrawText("ALERT!", 10, 10, 32, YELLOW())
 ```
 
-4. RLGL enum are now named as `RLGLEnum` (Since it's not named...)
+3. RLGL enum are now named as `RLGLEnum` (Since it's not named...)
 
 ### Contribute
 

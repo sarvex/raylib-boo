@@ -1,6 +1,6 @@
 // Written by Rabia Alhaffar in 17/October/2020
 // raylib-boo, Single-file Boo bindings for raylib library!
-// Updated: 20/October/2020
+// Updated: 16/November/2020
 namespace raylib_boo
 import System
 import System.Runtime.InteropServices
@@ -27,149 +27,149 @@ def MAX_TOUCH_POINTS() as int:
 // Vector2 type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Vector2:
-	_x as single
-	_y as single
+	x as single
+	y as single
 	
-	def constructor(x as single, y as single):
-		_x = x
-		_y = y
+	def constructor(_x as single, _y as single):
+		x = _x
+		y = _y
 		
-	def constructor(x as int, y as int):
-		_x = System.Convert.ToSingle(x)
-		_y = System.Convert.ToSingle(y)
+	def constructor(_x as int, _y as int):
+		x = System.Convert.ToSingle(x)
+		y = System.Convert.ToSingle(y)
 
 // Vector3 type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Vector3:
-	_x as single
-	_y as single
-	_z as single
+	x as single
+	y as single
+	z as single
 	
-	def constructor(x as single, y as single, z as single):
-		_x = x
-		_y = y
-		_z = z
+	def constructor(_x as single, _y as single, _z as single):
+		x = _x
+		y = _y
+		z = _z
 		
-	def constructor(x as int, y as int, z as int):
-		_x = System.Convert.ToSingle(x)
-		_y = System.Convert.ToSingle(y)
-		_z = System.Convert.ToSingle(z)
+	def constructor(_x as int, _y as int, _z as int):
+		x = System.Convert.ToSingle(_x)
+		y = System.Convert.ToSingle(_y)
+		z = System.Convert.ToSingle(_z)
 
 // Vector4 type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Vector4:
-	_x as single
-	_y as single
-	_z as single
-	_w as single
+	x as single
+	y as single
+	z as single
+	w as single
 	
-	def constructor(x as single, y as single, z as single, w as single):
-		_x = x
-		_y = y
-		_z = z
-		_w = w
+	def constructor(_x as single, _y as single, _z as single, _w as single):
+		x = _x
+		y = _y
+		z = _z
+		w = _w
 		
-	def constructor(x as int, y as int, z as int, w as int):
-		_x = System.Convert.ToSingle(x)
-		_y = System.Convert.ToSingle(y)
-		_z = System.Convert.ToSingle(z)
-		_w = System.Convert.ToSingle(w)
+	def constructor(_x as int, _y as int, _z as int, _w as int):
+		x = System.Convert.ToSingle(_x)
+		y = System.Convert.ToSingle(_y)
+		z = System.Convert.ToSingle(_z)
+		w = System.Convert.ToSingle(_w)
 
 // Quaternion type, same as Vector4
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Quaternion:
-	_x as single
-	_y as single
-	_z as single
-	_w as single
+	x as single
+	y as single
+	z as single
+	w as single
 	
-	def constructor(x as single, y as single, z as single, w as single):
-		_x = x
-		_y = y
-		_z = z
-		_w = w
+	def constructor(_x as single, _y as single, _z as single, _w as single):
+		x = _x
+		y = _y
+		z = _z
+		w = _w
 	
-	def constructor(x as int, y as int, z as int, w as int):
-		_x = System.Convert.ToSingle(x)
-		_y = System.Convert.ToSingle(y)
-		_z = System.Convert.ToSingle(z)
-		_w = System.Convert.ToSingle(w)
+	def constructor(_x as int, _y as int, _z as int, _w as int):
+		x = System.Convert.ToSingle(_x)
+		y = System.Convert.ToSingle(_y)
+		z = System.Convert.ToSingle(_z)
+		w = System.Convert.ToSingle(_w)
 
 // Matrix type (OpenGL style 4x4 - right handed, column major)
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Matrix:
-	_m0 as single
-	_m1 as single
-	_m2 as single
-	_m3 as single
-	_m4 as single
-	_m5 as single
-	_m6 as single
-	_m7 as single
-	_m8 as single
-	_m9 as single
-	_m10 as single
-	_m11 as single
-	_m12 as single
-	_m13 as single
-	_m14 as single
-	_m15 as single
+	m0 as single
+	m1 as single
+	m2 as single
+	m3 as single
+	m4 as single
+	m5 as single
+	m6 as single
+	m7 as single
+	m8 as single
+	m9 as single
+	m10 as single
+	m11 as single
+	m12 as single
+	m13 as single
+	m14 as single
+	m15 as single
 	
-	def constructor(m0 as single, m1 as single, m2 as single, m3 as single, m4 as single, m5 as single, m6 as single, m7 as single, m8 as single, m9 as single, m10 as single, m11 as single, m12 as single, m13 as single, m14 as single, m15 as single):
-		_m0 = m0
-		_m1 = m1
-		_m2 = m2
-		_m3 = m3
-		_m4 = m4
-		_m5 = m5
-		_m6 = m6
-		_m7 = m7
-		_m8 = m8
-		_m9 = m9
-		_m10 = m10
-		_m11 = m11
-		_m12 = m12
-		_m13 = m13
-		_m14 = m14
-		_m15 = m15
+	def constructor(_m0 as single, _m1 as single, _m2 as single, _m3 as single, _m4 as single, _m5 as single, _m6 as single, _m7 as single, _m8 as single, _m9 as single, _m10 as single, _m11 as single, _m12 as single, _m13 as single, _m14 as single, _m15 as single):
+		m0 = _m0
+		m1 = _m1
+		m2 = _m2
+		m3 = _m3
+		m4 = _m4
+		m5 = _m5
+		m6 = _m6
+		m7 = _m7
+		m8 = _m8
+		m9 = _m9
+		m10 = _m10
+		m11 = _m11
+		m12 = _m12
+		m13 = _m13
+		m14 = _m14
+		m15 = _m15
 		
-	def constructor(m0 as int, m1 as int, m2 as int, m3 as int, m4 as int, m5 as int, m6 as int, m7 as int, m8 as int, m9 as int, m10 as int, m11 as int, m12 as int, m13 as int, m14 as int, m15 as int):
-		_m0 = System.Convert.ToSingle(m0)
-		_m1 = System.Convert.ToSingle(m1)
-		_m2 = System.Convert.ToSingle(m2)
-		_m3 = System.Convert.ToSingle(m3)
-		_m4 = System.Convert.ToSingle(m4)
-		_m5 = System.Convert.ToSingle(m5)
-		_m6 = System.Convert.ToSingle(m6)
-		_m7 = System.Convert.ToSingle(m7)
-		_m8 = System.Convert.ToSingle(m8)
-		_m9 = System.Convert.ToSingle(m9)
-		_m10 = System.Convert.ToSingle(m10)
-		_m11 = System.Convert.ToSingle(m11)
-		_m12 = System.Convert.ToSingle(m12)
-		_m13 = System.Convert.ToSingle(m13)
-		_m14 = System.Convert.ToSingle(m14)
-		_m15 = System.Convert.ToSingle(m15)
+	def constructor(_m0 as int, _m1 as int, _m2 as int, _m3 as int, _m4 as int, _m5 as int, _m6 as int, _m7 as int, _m8 as int, _m9 as int, _m10 as int, _m11 as int, _m12 as int, _m13 as int, _m14 as int, _m15 as int):
+		m0 = System.Convert.ToSingle(_m0)
+		m1 = System.Convert.ToSingle(_m1)
+		m2 = System.Convert.ToSingle(_m2)
+		m3 = System.Convert.ToSingle(_m3)
+		m4 = System.Convert.ToSingle(_m4)
+		m5 = System.Convert.ToSingle(_m5)
+		m6 = System.Convert.ToSingle(_m6)
+		m7 = System.Convert.ToSingle(_m7)
+		m8 = System.Convert.ToSingle(_m8)
+		m9 = System.Convert.ToSingle(_m9)
+		m10 = System.Convert.ToSingle(_m10)
+		m11 = System.Convert.ToSingle(_m11)
+		m12 = System.Convert.ToSingle(_m12)
+		m13 = System.Convert.ToSingle(_m13)
+		m14 = System.Convert.ToSingle(_m14)
+		m15 = System.Convert.ToSingle(_m15)
 
 // Color type, RGBA (32bit)
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Color:
-	_r as byte
-	_g as byte
-	_b as byte
-	_a as byte
+	r as byte
+	g as byte
+	b as byte
+	a as byte
 
-	def constructor(r as byte, g as byte, b as byte, a as byte):
-		_r = r
-		_g = g
-		_b = b
-		_a = a
+	def constructor(_r as byte, _g as byte, _b as byte, _a as byte):
+		r = _r
+		g = _g
+		b = _b
+		a = _a
 	
-	def constructor(r as int, g as int, b as int, a as int):
-		_r = System.Convert.ToByte(r)
-		_g = System.Convert.ToByte(g)
-		_b = System.Convert.ToByte(b)
-		_a = System.Convert.ToByte(a)
+	def constructor(_r as int, _g as int, _b as int, _a as int):
+		r = System.Convert.ToByte(_r)
+		g = System.Convert.ToByte(_g)
+		b = System.Convert.ToByte(_b)
+		a = System.Convert.ToByte(_a)
 
 // Some Basic Colors
 // NOTE: Custom raylib color palette for amazing visuals on WHITE background
@@ -254,278 +254,278 @@ def RAYWHITE() as Color:
 // Rectangle type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Rectangle:
-	_x as single
-	_y as single
-	_width as single
-	_height as single
+	x as single
+	y as single
+	width as single
+	height as single
 	
-	def constructor(x as single, y as single, width as single, height as single):
-		_x = x
-		_y = y
-		_width = width
-		_height = height
+	def constructor(_x as single, _y as single, _width as single, _height as single):
+		x = _x
+		y = _y
+		width = _width
+		height = _height
 		
-	def constructor(x as int, y as int, width as int, height as int):
-		_x = System.Convert.ToSingle(x)
-		_y = System.Convert.ToSingle(y)
-		_width = System.Convert.ToSingle(width)
-		_height = System.Convert.ToSingle(height)
+	def constructor(_x as int, _y as int, _width as int, _height as int):
+		x = System.Convert.ToSingle(_x)
+		y = System.Convert.ToSingle(_y)
+		width = System.Convert.ToSingle(_width)
+		height = System.Convert.ToSingle(_height)
 
 // Image type, bpp always RGBA (32bit)
 // NOTE: Data stored in CPU memory (RAM)
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Image:
-	_data as IntPtr
-	_width as int
-	_height as int
-	_mipmaps as int
-	_format as int
+	data as IntPtr
+	width as int
+	height as int
+	mipmaps as int
+	format as int
 
 // Texture2D type
 // NOTE: Data stored in GPU memory
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Texture2D:
-	_id as uint
-	_width as int
-	_height as int
-	_mipmaps as int
-	_format as int
+	id as uint
+	width as int
+	height as int
+	mipmaps as int
+	format as int
 
 // Texture type, same as Texture2D
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Texture:
-	_id as uint
-	_width as int
-	_height as int
-	_mipmaps as int
-	_format as int
+	id as uint
+	width as int
+	height as int
+	mipmaps as int
+	format as int
 
 // TextureCubemap type, actually, same as Texture2D
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct TextureCubemap:
-	_id as uint
-	_width as int
-	_height as int
-	_mipmaps as int
-	_format as int
+	id as uint
+	width as int
+	height as int
+	mipmaps as int
+	format as int
 
 // RenderTexture2D type, for texture rendering
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct RenderTexture2D:
-	_id as uint
-	_texture as Texture2D
-	_depth as Texture2D
-	_depthTexture as bool
+	id as uint
+	texture as Texture2D
+	depth as Texture2D
+	depthTexture as bool
 
 // RenderTexture type, same as RenderTexture2D
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct RenderTexture:
-	_id as uint
-	_texture as Texture2D
-	_depth as Texture2D
-	_depthTexture as bool
+	id as uint
+	texture as Texture2D
+	depth as Texture2D
+	depthTexture as bool
 
 // N-Patch layout info
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct NPatchInfo:
-	_sourceRec as Rectangle
-	_left as int
-	_top as int
-	_right as int
-	_bottom as int
-	_type as int
+	sourceRec as Rectangle
+	left as int
+	top as int
+	right as int
+	bottom as int
+	type as int
 
 // Font character info
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct CharInfo:
-	_value as int
-	_offsetX as int
-	_offsetY as int
-	_advanceX as int
-	_image as Image
+	value as int
+	offsetX as int
+	offsetY as int
+	advanceX as int
+	image as Image
 
 // Font type, includes texture and charSet array data
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Font:
-	_baseSize as int
-	_charsCount as int
-	_texture as Texture2D
-	_recs as IntPtr
-	_chars as IntPtr
+	baseSize as int
+	charsCount as int
+	texture as Texture2D
+	recs as IntPtr
+	chars as IntPtr
 
 // SpriteFont type fallback, defaults to Font
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct SpriteFont:
-	_baseSize as int
-	_charsCount as int
-	_texture as Texture2D
-	_recs as IntPtr
-	_chars as IntPtr
+	baseSize as int
+	charsCount as int
+	texture as Texture2D
+	recs as IntPtr
+	chars as IntPtr
 
 // Camera type, defines a camera position/orientation in 3d space
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Camera3D:
-	_position as Vector3
-	_target as Vector3
-	_up as Vector3
-	_fovy as int
-	_type as int
+	position as Vector3
+	target as Vector3
+	up as Vector3
+	fovy as int
+	type as int
 	
-	def constructor(position as Vector3, target as Vector3, up as Vector3, fovy as int, type as int):
-		_position = position
-		_target = target
-		_up = up
-		_fovy = fovy
-		_type = type
+	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as int, _type as int):
+		position = _position
+		target = _target
+		up = _up
+		fovy = _fovy
+		type = _type
 
 // Camera type fallback, defaults to Camera3D
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Camera:
-	_position as Vector3
-	_target as Vector3
-	_up as Vector3
-	_fovy as int
-	_type as int
+	position as Vector3
+	target as Vector3
+	up as Vector3
+	fovy as int
+	type as int
 	
-	def constructor(position as Vector3, target as Vector3, up as Vector3, fovy as int, type as int):
-		_position = position
-		_target = target
-		_up = up
-		_fovy = fovy
-		_type = type
+	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as int, _type as int):
+		position = _position
+		target = _target
+		up = _up
+		fovy = _fovy
+		type = _type
 
 // Camera2D type, defines a 2d camera
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Camera2D:
-	_offset as Vector2
-	_target as Vector2
-	_rotation as single
-	_zoom as single
+	offset as Vector2
+	target as Vector2
+	rotation as single
+	zoom as single
 	
-	def constructor(offset as Vector2, target as Vector2, rotation as single, zoom as single):
-		_offset = offset
-		_target = target
-		_rotation = rotation
-		_zoom = zoom
+	def constructor(_offset as Vector2, _target as Vector2, _rotation as single, _zoom as single):
+		offset = _offset
+		target = _target
+		rotation = _rotation
+		zoom = _zoom
 		
 // Vertex data definning a mesh
 // NOTE: Data stored in CPU memory (and GPU)
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Mesh:
-	_vertexCount as int
-	_triangleCount as int
+	vertexCount as int
+	triangleCount as int
 	
-	_vertices as IntPtr
-	_texcoords as IntPtr
-	_texcoords2 as IntPtr
-	_normals as IntPtr
-	_tangents as IntPtr
-	_colors as IntPtr
-	_indices as IntPtr
+	vertices as IntPtr
+	texcoords as IntPtr
+	texcoords2 as IntPtr
+	normals as IntPtr
+	tangents as IntPtr
+	colors as IntPtr
+	indices as IntPtr
 	
-	_animVertices as IntPtr
-	_animNormas as IntPtr
-	_boneIds as IntPtr
-	_boneWeights as IntPtr
+	animVertices as IntPtr
+	animNormas as IntPtr
+	boneIds as IntPtr
+	boneWeights as IntPtr
 	
-	_vaoId as uint
-	_vboId as IntPtr
+	vaoId as uint
+	vboId as IntPtr
 
 // Shader type (generic)
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Shader:
-	_id as uint
-	_locs as IntPtr
+	id as uint
+	locs as IntPtr
 
 // Material texture map
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct MaterialMap:
-	_texture as Texture2D
-	_color as Color
-	_value as single
+	texture as Texture2D
+	color as Color
+	value as single
 
 // Material type (generic)
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Material:
-	_shader as Shader
-	_maps as IntPtr
-	_params as IntPtr
+	shader as Shader
+	maps as IntPtr
+	params as IntPtr
 
 // Transformation properties
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Transform:
-	_translation as Vector3
-	_rotation as Quaternion
-	_scale as Vector3
+	translation as Vector3
+	rotation as Quaternion
+	scale as Vector3
 
 // Bone information
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct BoneInfo:
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 32)]
-	_name as (char)
-	_parent as int
+	name as (char)
+	parent as int
 
 // Model type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Model:
-	_transform as Matrix
+	transform as Matrix
 	
-	_meshCount as int
-	_meshes as IntPtr
+	meshCount as int
+	meshes as IntPtr
 	
-	_materialCount as int
-	_materials as IntPtr
-	_meshMaterial as IntPtr
+	materialCount as int
+	materials as IntPtr
+	meshMaterial as IntPtr
 	
-	_boneCount as int
-	_bones as IntPtr
-	_bindPose as IntPtr
+	boneCount as int
+	bones as IntPtr
+	bindPose as IntPtr
 
 // Model animation
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct ModelAnimation:
-	_boneCount as int
-	_bones as IntPtr
+	boneCount as int
+	bones as IntPtr
 	
-	_frameCount as int
-	_framePoses as IntPtr
+	frameCount as int
+	framePoses as IntPtr
 
 // Ray type (useful for raycast)
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Ray:
-	_position as Vector3
-	_direction as Vector3
+	position as Vector3
+	direction as Vector3
 	
-	def constructor(position as Vector3, direction as Vector3):
-		_position = position
-		_direction = direction
+	def constructor(_position as Vector3, _direction as Vector3):
+		position = _position
+		direction = _direction
 
 // Raycast hit information
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct RayHitInfo:
-	_hit as bool
-	_distance as single
-	_position as Vector3
-	_normal as Vector3
+	hit as bool
+	distance as single
+	position as Vector3
+	normal as Vector3
 
 // Bounding box type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct BoundingBox:
-	_min as Vector3
-	_max as Vector3
+	min as Vector3
+	max as Vector3
 	
-	def constructor(min as Vector3, max as Vector3):
-		_min = min
-		_max = max
+	def constructor(_min as Vector3, _max as Vector3):
+		min = _min
+		max = _max
 
 // Wave type, defines audio wave data
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Wave:
-	_sampleCount as uint
-	_sampleRate as uint
-	_sampleSize as uint
-	_channels as uint
-	_data as IntPtr
+	sampleCount as uint
+	sampleRate as uint
+	sampleSize as uint
+	channels as uint
+	data as IntPtr
 
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct rAudioBuffer:
@@ -535,46 +535,46 @@ public struct rAudioBuffer:
 // NOTE: Useful to create custom audio streams not bound to a specific file
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct AudioStream:
-	_sampleRate as uint
-	_sampleSize as uint
-	_channels as uint
-	_buffer as IntPtr
+	sampleRate as uint
+	sampleSize as uint
+	channels as uint
+	buffer as IntPtr
 
 // Sound source type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Sound:
-	_sampleCount as uint
-	_stream as AudioStream
+	sampleCount as uint
+	stream as AudioStream
 
 // Music stream type (audio file streaming from memory)
 // NOTE: Anything longer than ~10 seconds should be streamed
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Music:
-	_ctxType as int
-	_ctxData as IntPtr
+	ctxType as int
+	ctxData as IntPtr
 	
-	_sampleCount as uint
-	_loopCount as uint
+	sampleCount as uint
+	loopCount as uint
 	
-	_stream as AudioStream
+	stream as AudioStream
 
 // Head-Mounted-Display device parameters
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct VrDeviceInfo:
-	_hResolution as int
-	_vResolution as int
-	_hScreenSize as single
-	_vScreenSize as single
-	_vScreenCenter as single
-	_eyeToScreenDistance as single
-	_lensSeparationDistance as single
-	_interpupillaryDistance as single
+	hResolution as int
+	vResolution as int
+	hScreenSize as single
+	vScreenSize as single
+	vScreenCenter as single
+	eyeToScreenDistance as single
+	lensSeparationDistance as single
+	interpupillaryDistance as single
 	
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
-	_lensDistortionValues as (single)
+	lensDistortionValues as (single)
 	
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
-	_chromaAbCorrection as (single)
+	chromaAbCorrection as (single)
 
 //----------------------------------------------------------------------------------
 // Enumerators Definition
@@ -1156,9 +1156,14 @@ def EndMode2D():
 
 // Initializes 3D mode with custom camera (3D)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def BeginMode3D(camera as Camera3D):
+def BeginMode3D(camera as Camera):
 	pass
 
+// Initializes 3D mode with custom camera (3D)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def BeginMode3D(camera as Camera3D):
+	pass
+	
 // Ends 3D mode and returns to default 2D orthographic mode
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def EndMode3D():
@@ -1169,6 +1174,11 @@ def EndMode3D():
 def BeginTextureMode(target as RenderTexture2D):
 	pass
 
+// Initializes render texture for drawing
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def BeginTextureMode(target as RenderTexture):
+	pass
+	
 // Ends drawing to render texture
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def EndTextureMode():
@@ -1190,11 +1200,22 @@ def EndScissorMode():
 def GetMouseRay(mousePosition as Vector2, camera as Camera) as Ray:
 	pass
 
+// Screen-space-related functions
+// Returns a ray trace from mouse position
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetMouseRay(mousePosition as Vector2, camera as Camera3D) as Ray:
+	pass
+	
 // Returns camera transform matrix (view matrix)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetCameraMatrix(camera as Camera) as Matrix:
 	pass
 
+// Returns camera transform matrix (view matrix)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetCameraMatrix(camera as Camera3D) as Matrix:
+	pass
+	
 // Returns camera 2d transform matrix
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetCameraMatrix2D(camera as Camera2D) as Matrix:
@@ -1205,9 +1226,19 @@ def GetCameraMatrix2D(camera as Camera2D) as Matrix:
 def GetWorldToScreen(position as Vector3, camera as Camera) as Vector2:
 	pass
 
+// Returns the screen space position for a 3d world space position
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetWorldToScreen(position as Vector3, camera as Camera3D) as Vector2:
+	pass
+
 // Returns size position for a 3d world space position
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetWorldToScreenEx(position as Vector3, camera as Camera, width as int, height as int) as Vector2:
+	pass
+
+// Returns size position for a 3d world space position
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetWorldToScreenEx(position as Vector3, camera as Camera3D, width as int, height as int) as Vector2:
 	pass
 
 // Returns the screen space position for a 2d camera world space position
@@ -1251,12 +1282,17 @@ def ColorToInt(color as Color) as int:
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def ColorNormalize(color as Color) as Vector4:
 	pass
-
+	
 // Returns color from normalized values [0..1]
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def ColorFromNormalized(normalized as Vector4) as Color:
 	pass
 
+// Returns color from normalized values [0..1]
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def ColorFromNormalized(normalized as Quaternion) as Color:
+	pass
+	
 // Returns HSV values for a Color
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def ColorToHSV(color as Color) as Vector3:
@@ -1653,10 +1689,20 @@ def GetGesturePinchAngle() as single:
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def SetCameraMode(camera as Camera, mode as int):
 	pass
+	
+// Set camera mode (multiple camera modes available)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def SetCameraMode(camera as Camera3D, mode as int):
+	pass
 
 // Update camera position for selected mode
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def UpdateCamera(ref camera as Camera):
+	pass
+
+// Update camera position for selected mode
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UpdateCamera(ref camera as Camera3D):
 	pass
 
 // Set camera pan key to combine with mouse movement (free camera)
@@ -2003,6 +2049,11 @@ def ImageText(text as string, fontSize as int, color as Color) as Image:
 def ImageTextEx(font as Font, text as string, fontSize as single, spacing as single, tint as Color) as Image:
 	pass
 
+// Create an image from text (custom sprite font)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def ImageTextEx(font as SpriteFont, text as string, fontSize as single, spacing as single, tint as Color) as Image:
+	pass
+
 // Convert image to POT (power-of-two)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def ImageToPOT(ref image as Image, fillColor as Color):
@@ -2195,6 +2246,11 @@ def ImageDrawText(ref dst as Image, position as Vector2, text as string, fontSiz
 def ImageDrawTextEx(ref dst as Image, position as Vector2, font as Font, text as string, fontSize as single, spacing as single, tint as Color):
 	pass
 
+// Draw text (custom sprite font) within an image (destination)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def ImageDrawTextEx(ref dst as Image, position as Vector2, font as SpriteFont, text as string, fontSize as single, spacing as single, tint as Color):
+	pass
+	
 // Texture loading functions
 // NOTE: These functions require GPU access
 // Load texture from file into GPU memory (VRAM)
@@ -2216,7 +2272,7 @@ def LoadTextureCubemap(image as Image, layoutType as int) as TextureCubemap:
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def LoadRenderTexture(width as int, height as int) as RenderTexture2D:
 	pass
-
+	
 // Unload texture from GPU memory (VRAM)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def UnloadTexture(texture as Texture2D):
@@ -2227,6 +2283,11 @@ def UnloadTexture(texture as Texture2D):
 def UnloadRenderTexture(target as RenderTexture2D):
 	pass
 
+// Unload render texture from GPU memory (VRAM)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadRenderTexture(target as RenderTexture):
+	pass
+	
 // Update GPU texture with new data
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def UpdateTexture(texture as Texture2D, pixels as IntPtr):
@@ -2309,17 +2370,17 @@ def GetPixelDataSize(width as int, height as int, format as int) as int:
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetFontDefault() as Font:
 	pass
-
+	
 // Load font from file into GPU memory (VRAM)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def LoadFont(fileName as string) as Font:
 	pass
-
+	
 // Load font from file with extended parameters
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def LoadFontEx(fileName as string, fontSize as int, fontChars as (int), charsCount as int):
+def LoadFontEx(fileName as string, fontSize as int, fontChars as (int), charsCount as int) as Font:
 	pass
-
+	
 // Load font from Image (XNA style)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def LoadFontFromImage(image as Image, key as Color, firstChar as int) as Font:
@@ -2340,6 +2401,11 @@ def GenImageFontAtlas(chars as IntPtr, ref recs as IntPtr, charsCount as int, fo
 def UnloadFont(font as Font):
 	pass
 
+// Unload Font from GPU memory (VRAM)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadFont(font as SpriteFont):
+	pass
+	
 // Text drawing functions
 // Shows current FPS
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
@@ -2356,14 +2422,29 @@ def DrawText(text as string, posX as int, posY as int, fontSize as int, color as
 def DrawTextEx(font as Font, text as string, position as Vector2, fontSize as single, spacing as single, tint as Color):
 	pass
 
+// Draw text using font and additional parameters
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawTextEx(font as SpriteFont, text as string, position as Vector2, fontSize as single, spacing as single, tint as Color):
+	pass
+	
 // Draw text using font inside rectangle limits
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def DrawTextRec(font as Font, text as string, rec as Rectangle, fontSize as single, spacing as single, wordWrap as bool, tint as Color):
 	pass
 
+// Draw text using font inside rectangle limits
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawTextRec(font as SpriteFont, text as string, rec as Rectangle, fontSize as single, spacing as single, wordWrap as bool, tint as Color):
+	pass
+	
 // Draw text using font inside rectangle limits with support for text selection
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def DrawTextRecEx(font as Font, text as string, rec as Rectangle, fontSize as single, spacing as single, wordWrap as bool, tint as Color, selectStart as int, selectLength as int, selectTint as Color, selectBackTint as Color):
+	pass
+
+// Draw text using font inside rectangle limits with support for text selection
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawTextRecEx(font as SpriteFont, text as string, rec as Rectangle, fontSize as single, spacing as single, wordWrap as bool, tint as Color, selectStart as int, selectLength as int, selectTint as Color, selectBackTint as Color):
 	pass
 
 // Draw one character (codepoint)
@@ -2371,6 +2452,11 @@ def DrawTextRecEx(font as Font, text as string, rec as Rectangle, fontSize as si
 def DrawTextCodepoint(font as Font, codepoint as int, position as Vector2, scale as single, tint as Color):
 	pass
 
+// Draw one character (codepoint)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawTextCodepoint(font as SpriteFont, codepoint as int, position as Vector2, scale as single, tint as Color):
+	pass
+	
 // Text misc. functions
 // Measure string width for default font
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
@@ -2382,11 +2468,21 @@ def MeasureText(text as string, fontSize as int) as int:
 def MeasureTextEx(font as Font, text as string, fontSize as single, spacing as single) as Vector2:
 	pass
 
+// Measure string size for Font
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def MeasureTextEx(font as SpriteFont, text as string, fontSize as single, spacing as single) as Vector2:
+	pass
+	
 // Get index position for a unicode character on font
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetGlyphIndex(font as Font, codepoint as int) as int:
 	pass
 
+// Get index position for a unicode character on font
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetGlyphIndex(font as SpriteFont, codepoint as int) as int:
+	pass
+	
 // Text strings management functions (no utf8 strings, only byte chars)
 // NOTE: Some strings allocate memory internally for returned strings, just be careful!
 // Copy one string to another, returns bytes copied
@@ -2764,11 +2860,21 @@ def DrawBoundingBox(box as BoundingBox, color as Color):
 def DrawBillboard(camera as Camera, texture as Texture2D, center as Vector3, size as single, tint as Color):
 	pass
 
+// Draw a billboard texture
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawBillboard(camera as Camera3D, texture as Texture2D, center as Vector3, size as single, tint as Color):
+	pass
+	
 // Draw a billboard texture defined by sourceRec
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def DrawBillboardRec(camera as Camera, texture as Texture2D, sourceRec as Rectangle, center as Vector3, size as single, tint as Color):
 	pass
 
+// Draw a billboard texture defined by sourceRec
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawBillboardRec(camera as Camera3D, texture as Texture2D, sourceRec as Rectangle, center as Vector3, size as single, tint as Color):
+	pass
+	
 // Collision detection functions
 // Detect collision between two spheres
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
@@ -2977,6 +3083,11 @@ def CloseVrSimulator():
 def UpdateVrTracking(ref camera as Camera):
 	pass
 
+// Update VR tracking (position and orientation) and camera
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UpdateVrTracking(ref camera as Camera3D):
+	pass
+	
 // Set stereo rendering configuration parameters
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def SetVrConfiguration(info as VrDeviceInfo, distortion as Shader):
@@ -3521,6 +3632,11 @@ def rlDeleteTextures(id as uint):
 def rlDeleteRenderTextures(target as RenderTexture2D):
 	pass
 
+// Delete render textures (fbo) from GPU
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDeleteRenderTextures(target as RenderTexture):
+	pass
+	
 // Delete OpenGL shader program from GPU
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlDeleteShader(id as uint):
@@ -3655,7 +3771,7 @@ def rlReadScreenPixels(width as int, height as int) as (byte):
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlLoadRenderTexture(width as int, height as int, format as int, depthBits as int, useDepthTexture as bool) as RenderTexture2D:
 	pass
-
+	
 // Attach texture/renderbuffer to an fbo
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlRenderTextureAttach(target as RenderTexture, id as uint, attachType as int):
