@@ -368,10 +368,10 @@ public struct Camera3D:
 	position as Vector3
 	target as Vector3
 	up as Vector3
-	fovy as int
+	fovy as single
 	type as int
 	
-	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as int, _type as int):
+	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as single, _type as int):
 		position = _position
 		target = _target
 		up = _up
@@ -384,10 +384,10 @@ public struct Camera:
 	position as Vector3
 	target as Vector3
 	up as Vector3
-	fovy as int
+	fovy as single
 	type as int
 	
-	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as int, _type as int):
+	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as single, _type as int):
 		position = _position
 		target = _target
 		up = _up
