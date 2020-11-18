@@ -18,14 +18,14 @@ screenHeight as int = 450
 InitWindow(screenWidth, screenHeight, "raylib [core] example - 3d picking")
 
 // Define the camera to look into our 3d world
-camera as Camera3D
-camera.position = Vector3(10, 10, 10)     		// Camera position
+camera as Camera
+camera.position = Vector3(10.0f, 10.0f, 10.0f)  // Camera position
 camera.target = Vector3(0.0f, 0.0f, 0.0f)       // Camera looking at point
 camera.up = Vector3(0.0f, 1.0f, 0.0f)           // Camera up vector (rotation towards target)
 camera.fovy = 45.0f                             // Camera field-of-view Y
 camera.type = CameraType.CAMERA_PERSPECTIVE     // Camera mode type
-cubePosition = Vector3(0, 1, 0)
-cubeSize = Vector3(2, 2, 2)
+cubePosition = Vector3(0.0f, 1.0f, 0.0f)
+cubeSize = Vector3(2.0f, 2.0f, 2.0f)
 
 ray as Ray        								// Picking line ray
 collision as bool = false
@@ -39,7 +39,7 @@ while not WindowShouldClose():                  // Detect window close button or
 	
 	// Update
 	//----------------------------------------------------------------------------------
-	c = do(ref c as Camera3D):					// Update camera
+	c = do(ref c as Camera):					// Update camera
 		UpdateCamera(c)
 	
 	c(camera)
