@@ -39,10 +39,7 @@ while not WindowShouldClose():                  // Detect window close button or
 	
 	// Update
 	//----------------------------------------------------------------------------------
-	c = do(ref c as Camera):					// Update camera
-		UpdateCamera(c)
-	
-	c(camera)
+	UpdateCamera(camera)
 	
 	if IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON):
 		if not collision:
