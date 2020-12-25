@@ -2707,10 +2707,7 @@ def TextLength(text as string) as uint:
 	pass
 
 // Text formatting with variables (sprintf style)
-// DEV NOTES: If this failed...Use string.Format instead!
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def TextFormat(text as string) as string:
-	pass
+// DEV NOTES: TextFormat and FormatText removed!, Use System.String.Format function instead!
 
 // Get a piece of a text string
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
@@ -3608,23 +3605,6 @@ def SetAudioStreamPitch(stream as AudioStream, pitch as single):
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def SetAudioStreamBufferSizeDefault(size as int):
 	pass
-
-// Text formatting with variables (sprintf style)
-// DEV NOTES: If this failed...Use string.Format instead!
-def FormatText(text as string) as string:
-	TextFormat(text)
-
-// Get a piece of a text string
-def SubText(text as string, position as int, length as int) as string:
-	TextSubtext(text, position, length)
-
-// Show the window
-def ShowWindow():
-	UnhideWindow()
-
-// Load text data from file (read), returns a '\0' terminated string
-def LoadText(fileName as string) as IntPtr:
-	LoadFileText(fileName)
 
 //------------------------------------------------------------------------------------
 // RLGL
@@ -4711,9 +4691,6 @@ def EaseElasticInOut(t as single, b as single, c as single, d as single) as sing
 
 // Temporal hack to avoid breaking old codebases using
 // deprecated raylib implementation of these functions
-def FormatText(text as string) as string:
-	return TextFormat(text)
-
 def LoadText(fileName) as string:
 	return LoadFileText(fileName)
 
@@ -4722,3 +4699,7 @@ def GetExtension(fileName as string) as string:
 
 def GetImageData(image as Image) as IntPtr:
 	return LoadImageColors(image)
+
+// Get a piece of a text string
+def SubText(text as string, position as int, length as int) as string:
+	TextSubtext(text, position, length)
