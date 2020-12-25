@@ -74,6 +74,7 @@ if IsKeyDown(KeyboardKey.KEY_A):
 ```
 
 3. RLGL enum are now named as `RLGLEnum` (Since it's not named...)
+4. Currently as `TextFormat` and `FormatText` removed, Use `System.String.Format` function instead!
 
 ### Contribute
 
