@@ -988,13 +988,6 @@ public enum CubemapLayoutType:
 	CUBEMAP_CROSS_FOUR_BY_THREE    // Layout is defined by a 4x3 cross with cubemap faces
 	CUBEMAP_PANORAMA               // Layout is defined by a panorama image (equirectangular map)
 
-// Texture parameters: wrap mode
-public enum TextureWrapMode:
-	WRAP_REPEAT = 0        // Repeats texture in tiled mode
-	WRAP_CLAMP             // Clamps texture to edge pixel in tiled mode
-	WRAP_MIRROR_REPEAT     // Mirrors and repeats the texture in tiled mode
-	WRAP_MIRROR_CLAMP      // Mirrors and clamps to border the texture in tiled mode
-
 // Font type, defines generation method
 public enum FontType:
 	FONT_DEFAULT = 0       // Default font generation, anti-aliased
@@ -1674,11 +1667,6 @@ def GetKeyPressed() as int:
 
 // Get char pressed (unicode), call it multiple times for chars queued
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetCharPressed() as int:
-	pass
-
-// Get char pressed (unicode), call it multiple times for chars queued
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetCharPressed() as char:
 	pass
 
@@ -1786,7 +1774,7 @@ def SetMouseScale(scaleX as single, scaleY as single):
 
 // Returns mouse wheel movement Y
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetMouseWheelMove() as float:
+def GetMouseWheelMove() as single:
 	pass
 
 // Returns mouse cursor if (MouseCursor enum)
@@ -3647,8 +3635,8 @@ public struct DrawCall:
 public struct RenderBatch:
 	buffersCount as int
 	currentBuffer as int
-	ref vertexBuffer as VertexBuffer
-	ref draws as DrawCall
+	vertexBuffer as (VertexBuffer)
+	draws as (DrawCall)
 	drawsCounter as int
 	currentDepth as single
 
@@ -3876,8 +3864,15 @@ def rlEnableShader(id as uint):
 def rlDisableShader():
 	pass
 
-void rlEnableFramebuffer(unsigned int id);              // Enable render texture (fbo)
-	void rlDisableFramebuffer(void);                        // Disable render texture (fbo), return to default framebuffer
+// Enable render texture (fbo)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableFramebuffer(id as uint):
+	pass
+
+// Disable render texture (fbo), return to default framebuffer
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableFramebuffer():
+	pass
 	
 // Enable depth test
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
@@ -4076,7 +4071,7 @@ def rlReadScreenPixels(width as int, height as int) as (byte):
 // Framebuffer management (fbo)
 // Load an empty framebuffer
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlLoadFramebuffer(int width, int height) as uint:
+def rlLoadFramebuffer(width as int, height as int) as uint:
 	pass
 
 // Attach texture/renderbuffer to a framebuffer
