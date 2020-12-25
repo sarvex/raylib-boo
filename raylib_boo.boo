@@ -1,6 +1,78 @@
 // Written by Rabia Alhaffar in 17/October/2020
 // raylib-boo, Single-file Boo bindings for raylib library!
-// Updated: 16/November/2020
+// Updated: 25/December/2020
+/**********************************************************************************************
+*
+*   raylib - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
+*
+*   FEATURES:
+*       - NO external dependencies, all required libraries included with raylib
+*       - Multiplatform: Windows, Linux, FreeBSD, OpenBSD, NetBSD, DragonFly, MacOS, UWP, Android, Raspberry Pi, HTML5.
+*       - Written in plain C code (C99) in PascalCase/camelCase notation
+*       - Hardware accelerated with OpenGL (1.1, 2.1, 3.3 or ES2 - choose at compile)
+*       - Unique OpenGL abstraction layer (usable as standalone module): [rlgl]
+*       - Multiple Fonts formats supported (TTF, XNA fonts, AngelCode fonts)
+*       - Outstanding texture formats support, including compressed formats (DXT, ETC, ASTC)
+*       - Full 3d support for 3d Shapes, Models, Billboards, Heightmaps and more!
+*       - Flexible Materials system, supporting classic maps and PBR maps
+*       - Skeletal Animation support (CPU bones-based animation)
+*       - Shaders support, including Model shaders and Postprocessing shaders
+*       - Powerful math module for Vector, Matrix and Quaternion operations: [raymath]
+*       - Audio loading and playing with streaming support (WAV, OGG, MP3, FLAC, XM, MOD)
+*       - VR stereo rendering with configurable HMD device parameters
+*       - Bindings to multiple programming languages available!
+*
+*   NOTES:
+*       One custom font is loaded by default when InitWindow() [core]
+*       If using OpenGL 3.3 or ES2, one default shader is loaded automatically (internally defined) [rlgl]
+*       If using OpenGL 3.3 or ES2, several vertex buffers (VAO/VBO) are created to manage lines-triangles-quads
+*
+*   DEPENDENCIES (included):
+*       [core] rglfw (github.com/glfw/glfw) for window/context management and input (only PLATFORM_DESKTOP)
+*       [rlgl] glad (github.com/Dav1dde/glad) for OpenGL 3.3 extensions loading (only PLATFORM_DESKTOP)
+*       [raudio] miniaudio (github.com/dr-soft/miniaudio) for audio device/context management
+*
+*   OPTIONAL DEPENDENCIES (included):
+*       [core] rgif (Charlie Tangora, Ramon Santamaria) for GIF recording
+*       [textures] stb_image (Sean Barret) for images loading (BMP, TGA, PNG, JPEG, HDR...)
+*       [textures] stb_image_write (Sean Barret) for image writting (BMP, TGA, PNG, JPG)
+*       [textures] stb_image_resize (Sean Barret) for image resizing algorithms
+*       [textures] stb_perlin (Sean Barret) for Perlin noise image generation
+*       [text] stb_truetype (Sean Barret) for ttf fonts loading
+*       [text] stb_rect_pack (Sean Barret) for rectangles packing
+*       [models] par_shapes (Philip Rideout) for parametric 3d shapes generation
+*       [models] tinyobj_loader_c (Syoyo Fujita) for models loading (OBJ, MTL)
+*       [models] cgltf (Johannes Kuhlmann) for models loading (glTF)
+*       [raudio] stb_vorbis (Sean Barret) for OGG audio loading
+*       [raudio] dr_flac (David Reid) for FLAC audio file loading
+*       [raudio] dr_mp3 (David Reid) for MP3 audio file loading
+*       [raudio] jar_xm (Joshua Reisenauer) for XM audio module loading
+*       [raudio] jar_mod (Joshua Reisenauer) for MOD audio module loading
+*
+*
+*   LICENSE: zlib/libpng
+*
+*   raylib is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   BSD-like license that allows static linking with closed source software:
+*
+*   Copyright (c) 2013-2020 Ramon Santamaria (@raysan5)
+*
+*   This software is provided "as-is", without any express or implied warranty. In no event
+*   will the authors be held liable for any damages arising from the use of this software.
+*
+*   Permission is granted to anyone to use this software for any purpose, including commercial
+*   applications, and to alter it and redistribute it freely, subject to the following restrictions:
+*
+*     1. The origin of this software must not be misrepresented; you must not claim that you
+*     wrote the original software. If you use this software in a product, an acknowledgment
+*     in the product documentation would be appreciated but is not required.
+*
+*     2. Altered source versions must be plainly marked as such, and must not be misrepresented
+*     as being the original software.
+*
+*     3. This notice may not be removed or altered from any source distribution.
+*
+**********************************************************************************************/
 namespace raylib_boo
 import System
 import System.Runtime.InteropServices
@@ -315,7 +387,6 @@ public struct RenderTexture2D:
 	id as uint
 	texture as Texture2D
 	depth as Texture2D
-	depthTexture as bool
 
 // RenderTexture type, same as RenderTexture2D
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -323,12 +394,11 @@ public struct RenderTexture:
 	id as uint
 	texture as Texture2D
 	depth as Texture2D
-	depthTexture as bool
 
 // N-Patch layout info
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct NPatchInfo:
-	sourceRec as Rectangle
+	source as Rectangle
 	left as int
 	top as int
 	right as int
@@ -349,6 +419,7 @@ public struct CharInfo:
 public struct Font:
 	baseSize as int
 	charsCount as int
+	charsPadding as int
 	texture as Texture2D
 	recs as IntPtr
 	chars as IntPtr
@@ -471,9 +542,9 @@ public struct Model:
 	transform as Matrix
 	
 	meshCount as int
-	meshes as IntPtr
-	
 	materialCount as int
+	
+	meshes as IntPtr
 	materials as IntPtr
 	meshMaterial as IntPtr
 	
@@ -485,9 +556,9 @@ public struct Model:
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct ModelAnimation:
 	boneCount as int
-	bones as IntPtr
-	
 	frameCount as int
+	
+	bones as IntPtr
 	framePoses as IntPtr
 
 // Ray type (useful for raycast)
@@ -535,28 +606,27 @@ public struct rAudioBuffer:
 // NOTE: Useful to create custom audio streams not bound to a specific file
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct AudioStream:
+	buffer as IntPtr
 	sampleRate as uint
 	sampleSize as uint
-	channels as uint
-	buffer as IntPtr
+	channels as uint	
 
 // Sound source type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Sound:
-	sampleCount as uint
 	stream as AudioStream
+	sampleCount as uint
 
 // Music stream type (audio file streaming from memory)
 // NOTE: Anything longer than ~10 seconds should be streamed
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct Music:
+	stream as AudioStream
+	sampleCount as uint
+	looping as bool
+	
 	ctxType as int
 	ctxData as IntPtr
-	
-	sampleCount as uint
-	loopCount as uint
-	
-	stream as AudioStream
 
 // Head-Mounted-Display device parameters
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -582,15 +652,20 @@ public struct VrDeviceInfo:
 // System config flags
 // NOTE: Used for bit masks
 public enum ConfigFlag:
-	FLAG_RESERVED           = 1    // Reserved
-	FLAG_FULLSCREEN_MODE    = 2    // Set to run program in fullscreen
-	FLAG_WINDOW_RESIZABLE   = 4    // Set to allow resizable window
-	FLAG_WINDOW_UNDECORATED = 8    // Set to disable window decoration (frame and buttons)
-	FLAG_WINDOW_TRANSPARENT = 16   // Set to allow transparent window
-	FLAG_WINDOW_HIDDEN      = 128  // Set to create the window initially hidden
-	FLAG_WINDOW_ALWAYS_RUN  = 256  // Set to allow windows running while minimized
-	FLAG_MSAA_4X_HINT       = 32   // Set to try enabling MSAA 4X
-	FLAG_VSYNC_HINT         = 64   // Set to try enabling V-Sync on GPU
+	FLAG_VSYNC_HINT         = 0x00000040   // Set to try enabling V-Sync on GPU
+	FLAG_FULLSCREEN_MODE    = 0x00000002   // Set to run program in fullscreen
+	FLAG_WINDOW_RESIZABLE   = 0x00000004   // Set to allow resizable window
+	FLAG_WINDOW_UNDECORATED = 0x00000008   // Set to disable window decoration (frame and buttons)
+	FLAG_WINDOW_HIDDEN      = 0x00000080   // Set to hide window
+	FLAG_WINDOW_MINIMIZED   = 0x00000200   // Set to minimize window (iconify)
+	FLAG_WINDOW_MAXIMIZED   = 0x00000400   // Set to maximize window (expanded to monitor)
+	FLAG_WINDOW_UNFOCUSED   = 0x00000800   // Set to window non focused
+	FLAG_WINDOW_TOPMOST     = 0x00001000   // Set to window always on top
+	FLAG_WINDOW_ALWAYS_RUN  = 0x00000100   // Set to allow windows running while minimized
+	FLAG_WINDOW_TRANSPARENT = 0x00000010   // Set to allow transparent framebuffer
+	FLAG_WINDOW_HIGHDPI     = 0x00002000   // Set to support HighDPI
+	FLAG_MSAA_4X_HINT       = 0x00000020   // Set to try enabling MSAA 4X
+	FLAG_INTERLACED_HINT    = 0x00010000    // Set to try enabling interlaced video format (for V3D)	
 
 // Trace log type
 public enum TraceLogType:
@@ -603,7 +678,9 @@ public enum TraceLogType:
 	LOG_FATAL
 	LOG_NONE            // Disable logging
 
-// Keyboard keys
+// Keyboard keys (US keyboard layout)
+// NOTE: Use GetKeyPressed() to allow redefining
+// required keys for alternative layouts
 public enum KeyboardKey:
 	// Alphanumeric keys
 	KEY_APOSTROPHE      = 39
@@ -716,6 +793,20 @@ public enum KeyboardKey:
 	KEY_KP_ENTER        = 335
 	KEY_KP_EQUAL        = 336
 
+// Mouse cursor types
+public enum MouseCursor:
+	MOUSE_CURSOR_DEFAULT       = 0
+	MOUSE_CURSOR_ARROW         = 1
+	MOUSE_CURSOR_IBEAM         = 2
+	MOUSE_CURSOR_CROSSHAIR     = 3
+	MOUSE_CURSOR_POINTING_HAND = 4
+	MOUSE_CURSOR_RESIZE_EW     = 5     // The horizontal resize/move arrow shape
+	MOUSE_CURSOR_RESIZE_NS     = 6     // The vertical resize/move arrow shape
+	MOUSE_CURSOR_RESIZE_NWSE   = 7     // The top-left to bottom-right diagonal resize/move arrow shape
+	MOUSE_CURSOR_RESIZE_NESW   = 8     // The top-right to bottom-left diagonal resize/move arrow shape
+	MOUSE_CURSOR_RESIZE_ALL    = 9     // The omni-directional resize/move cursor shape
+	MOUSE_CURSOR_NOT_ALLOWED   = 10    // The operation-not-allowed shape
+	
 // Android buttons
 public enum AndroidButton:
 	KEY_BACK            = 4
@@ -736,7 +827,7 @@ public enum GamepadNumber:
 	GAMEPAD_PLAYER3     = 2
 	GAMEPAD_PLAYER4     = 3
 
-// Gamepad Buttons
+// Gamepad buttons
 public enum GamepadButton:
 	// This is here just for error checking
 	GAMEPAD_BUTTON_UNKNOWN = 0
@@ -787,7 +878,7 @@ public enum GamepadAxis:
 	GAMEPAD_AXIS_LEFT_TRIGGER      // [1..-1] (pressure-level)
 	GAMEPAD_AXIS_RIGHT_TRIGGER     // [1..-1] (pressure-level)
 
-// Shader location point type
+// Shader location points
 public enum ShaderLocationIndex:
 	LOC_VERTEX_POSITION = 0
 	LOC_VERTEX_TEXCOORD01
@@ -829,7 +920,7 @@ public enum ShaderUniformDataType:
 	UNIFORM_IVEC4
 	UNIFORM_SAMPLER2D
 
-// Material map type
+// Material maps
 public enum MaterialMapType:
 	MAP_ALBEDO    = 0       // MAP_DIFFUSE
 	MAP_METALNESS = 1       // MAP_SPECULAR
@@ -881,7 +972,14 @@ public enum TextureFilterMode:
 	FILTER_ANISOTROPIC_8X          // Anisotropic filtering 8x
 	FILTER_ANISOTROPIC_16X         // Anisotropic filtering 16x
 
-// Cubemap layout type
+// Texture parameters: wrap mode
+public enum TextureWrapMode:
+	WRAP_REPEAT = 0        	// Repeats texture in tiled mode
+	WRAP_CLAMP             	// Clamps texture to edge pixel in tiled mode
+	WRAP_MIRROR_REPEAT     	// Mirrors and repeats the texture in tiled mode
+	WRAP_MIRROR_CLAMP       // Mirrors and clamps to border the texture in tiled mode
+
+// Cubemap layouts
 public enum CubemapLayoutType:
 	CUBEMAP_AUTO_DETECT = 0        // Automatically detect layout type
 	CUBEMAP_LINE_VERTICAL          // Layout is defined by a vertical line with faces
@@ -908,7 +1006,10 @@ public enum BlendMode:
 	BLEND_ALPHA = 0        // Blend textures considering alpha (default)
 	BLEND_ADDITIVE         // Blend textures adding colors
 	BLEND_MULTIPLIED       // Blend textures multiplying colors
-
+	BLEND_ADD_COLORS       // Blend textures adding colors (alternative)
+	BLEND_SUBTRACT_COLORS  // Blend textures subtracting colors (alternative)
+	BLEND_CUSTOM           // Belnd textures using custom src/dst factors (use SetBlendModeCustom())
+		
 // Gestures type
 // NOTE: It could be used as flags to enable only some gestures
 public enum GestureType:
@@ -937,7 +1038,7 @@ public enum CameraType:
 	CAMERA_PERSPECTIVE = 0
 	CAMERA_ORTHOGRAPHIC
 
-// Type of n-patch
+// N-patch types
 public enum NPatchType:
 	NPT_9PATCH = 0         // Npatch defined by 3x3 tiles
 	NPT_3PATCH_VERTICAL    // Npatch defined by 1x3 tiles
@@ -977,17 +1078,57 @@ def CloseWindow():
 def IsWindowReady() as bool:
 	pass
 
-// Check if window has been minimized (or lost focus)
+// Check if window is currently minimized (only PLATFORM_DESKTOP)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def IsWindowMinimized() as bool:
 	pass
 	
-// Check if window has been resized
+// Check if window is currently maximized (only PLATFORM_DESKTOP)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def IsWindowMaximized() as bool:
+	pass
+
+// Check if window is currently focused (only PLATFORM_DESKTOP)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def IsWindowFocused() as bool:
+	pass
+
+// Check if window has been resized last frame
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def IsWindowResized() as bool:
 	pass
 
-// Check if window is currently hidden	
+// Check if one specific window flag is enabled
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def IsWindowState(flag as uint) as bool:
+	pass
+
+// Set window configuration state using flags
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def SetWindowState(flags as uint):
+	pass
+
+// Clear window configuration state flags
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def ClearWindowState(flags as uint):
+	pass
+
+// Set window state: maximized, if resizable (only PLATFORM_DESKTOP)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def MaximizeWindow():
+	pass
+
+// Set window state: minimized, if resizable (only PLATFORM_DESKTOP)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def MinimizeWindow():
+	pass
+
+// Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def RestoreWindow():
+	pass
+
+// Check if window is currently hidden (only PLATFORM_DESKTOP)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def IsWindowHidden() as bool:
 	pass
@@ -1000,16 +1141,6 @@ def IsWindowFullscreen() as bool:
 // Toggle fullscreen mode (only PLATFORM_DESKTOP)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def ToggleFullscreen():
-	pass
-
-// Show the window
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def UnhideWindow():
-	pass
-	
-// Hide the window
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def HideWindow():
 	pass
 
 // Set icon for window (only PLATFORM_DESKTOP)
@@ -1062,22 +1193,27 @@ def GetScreenHeight() as int:
 def GetMonitorCount() as int:
 	pass
 
-// Get primary monitor width
+// Get specified monitor position
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetMonitorPosition(monitor as int) as Vector2:
+	pass
+
+// Get specified monitor width
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetMonitorWidth(monitor as int):
 	pass
 
-// Get primary monitor height
+// Get specified monitor height
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetMonitorHeight(monitor as int):
 	pass
 
-// Get primary monitor physical width in millimetres
+// Get specified monitor physical width in millimetres
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetMonitorPhysicalWidth(monitor as int):
 	pass
 
-// Get primary monitor physical height in millimetres
+// Get specified monitor physical height in millimetres
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetMonitorPhysicalHeight(monitor as int):
 	pass
@@ -1087,7 +1223,7 @@ def GetMonitorPhysicalHeight(monitor as int):
 def GetWindowPosition() as Vector2:
 	pass
 
-// Get the human-readable, UTF-8 encoded name of the primary monitor
+// Get the human-readable, UTF-8 encoded name of the specified monitor
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetMonitorName(monitor as int) as string:
 	pass
@@ -1300,7 +1436,7 @@ def ColorToHSV(color as Color) as Vector3:
 
 // Returns a Color from HSV values
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def ColorFromHSV(hsv as Vector3) as Color:
+def ColorFromHSV(hue as single, saturation as single, value as single) as Color:
 	pass
 
 // Returns a Color struct from hexadecimal value
@@ -1314,7 +1450,7 @@ def Fade(color as Color, alpha as single) as Color:
 	pass
 
 // Misc. functions
-// Setup window configuration flags (view FLAGS)
+// Setup init configuration flags (view FLAGS)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def SetConfigFlags(flags as uint) as int:
 	pass
@@ -1339,6 +1475,16 @@ def SetTraceLogCallback(callback as int):
 def TraceLog(logType as int, text as string):
 	pass
 
+// Internal memory allocator
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def MemAlloc(size as int) as IntPtr:
+	pass
+
+// Internal memory free
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def MemFree(ptr as IntPtr):
+	pass
+	
 // Takes a screenshot of current screen (saved a .png)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def TakeScreenshot(fileName as string):
@@ -1355,19 +1501,29 @@ def GetRandomValue(min as int, max as int) as int:
 def LoadFileData(fileName as string, ref bytesRead as IntPtr) as (byte):
 	pass
 
-// Save data to file from byte array (write)
+// Unload file data allocated by LoadFileData()
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SaveFileData(fileName as string, data as IntPtr, bytesToWrite as uint):
+def UnloadFileData(data as IntPtr):
+	pass
+
+// Save data to file from byte array (write), returns true on success
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def SaveFileData(fileName as string, data as IntPtr, bytesToWrite as uint) as bool:
 	pass
 
 // Load text data from file (read), returns a '\0' terminated string
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def LoadFileText(fileName as string) as IntPtr:
+def LoadFileText(fileName as string) as string:
 	pass
 
-// Save text data to file (write), string must be '\0' terminated
+// Unload file text data allocated by LoadFileText()
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SaveFileText(fileName as string, text as IntPtr):
+def UnloadFileText(text as string):
+	pass
+
+// Save text data to file (write), string must be '\0' terminated, returns true on success
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def SaveFileText(fileName as string, text as string) as bool:
 	pass
 
 // Check if file exists
@@ -1375,7 +1531,7 @@ def SaveFileText(fileName as string, text as IntPtr):
 def FileExists(fileName as string) as bool:
 	pass
 
-// Check file extension
+// Check file extension (including point: .png, .wav)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def IsFileExtension(fileName as string, ext as string) as bool:
 	pass
@@ -1385,9 +1541,9 @@ def IsFileExtension(fileName as string, ext as string) as bool:
 def DirectoryExists(dirPath as string) as bool:
 	pass
 
-// Get pointer to extension for a filename string
+// Get pointer to extension for a filename string (including point: ".png")
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetExtension(fileName as string) as string:
+def GetFileExtension(fileName as string) as string:
 	pass
 
 // Get pointer to filename for a path string
@@ -1425,7 +1581,7 @@ def GetDirectoryFiles(dirPath as string, ref count as int) as (string):
 def ClearDirectoryFiles():
 	pass
 
-// Change working directory, returns true if success
+// Change working directory, return true on success
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def ChangeDirectory(dir as string) as bool:
 	pass
@@ -1450,20 +1606,20 @@ def ClearDroppedFiles():
 def GetFileModTime(fileName as string) as long:
 	pass
 
-// Compress data (DEFLATE algorythm)
+// Compress data (DEFLATE algorithm)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def CompressData(ref data as (byte), dataLength as int, ref compDataLength as int) as (byte):
 	pass
 
-// Decompress data (DEFLATE algorythm)
+// Decompress data (DEFLATE algorithm)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def DecompressData(ref compData as (byte), ref compDataLength as int, ref dataLength as int) as (byte):
 	pass
 
 // Persistent storage management
-// Save integer value to storage file (to defined position)
+// Save integer value to storage file (to defined position), returns true on success
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SaveStorageValue(position as uint, value as int):
+def SaveStorageValue(position as uint, value as int) as bool:
 	pass
 
 // Load integer value from storage file (from defined position)
@@ -1506,9 +1662,19 @@ def IsKeyUp(key as int) as bool:
 def SetExitKey(key as int):
 	pass
 
-// Get key pressed, call it multiple times for chars queued
+// Get key pressed (keycode), call it multiple times for keys queued
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetKeyPressed() as int:
+	pass
+
+// Get char pressed (unicode), call it multiple times for chars queued
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetCharPressed() as int:
+	pass
+
+// Get char pressed (unicode), call it multiple times for chars queued
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetCharPressed() as char:
 	pass
 
 // Input-related functions: gamepads
@@ -1615,9 +1781,19 @@ def SetMouseScale(scaleX as single, scaleY as single):
 
 // Returns mouse wheel movement Y
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetMouseWheelMove() as int:
+def GetMouseWheelMove() as float:
 	pass
 
+// Returns mouse cursor if (MouseCursor enum)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetMouseCursor() as int:
+	pass
+
+// Set mouse cursor
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def SetMouseCursor(cursor as int):
+	pass
+	
 // Input-related functions: touch
 // Returns touch position X for touch point 0 (relative to screen size)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
@@ -1707,22 +1883,22 @@ def UpdateCamera(ref camera as Camera3D):
 
 // Set camera pan key to combine with mouse movement (free camera)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SetCameraPanControl(panKey as int):
+def SetCameraPanControl(keyPan as int):
 	pass
 
 // Set camera alt key to combine with mouse movement (free camera)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SetCameraAltControl(altKey as int):
+def SetCameraAltControl(keyAlt as int):
 	pass
 	
 // Set camera smooth zoom key to combine with mouse (free camera)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SetCameraSmoothZoomControl(szKey as int):
+def SetCameraSmoothZoomControl(keySmoothZoom as int):
 	pass
 
 // Set camera move controls (1st person and 3rd person cameras)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SetCameraMoveControls(frontKey as int, backKey as int, rightKey as int, leftKey as int, upKey as int, downKey as int):
+def SetCameraMoveControls(keyFront as int, keyBack as int, keyRight as int, keyLeft as int, keyUp as int, keyDown as int):
 	pass
 
 //------------------------------------------------------------------------------------
@@ -1762,7 +1938,7 @@ def DrawLineBezier(startPos as Vector2, endPos as Vector2, thick as single, colo
 
 // Draw lines sequence
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawLineStrip(ref points as Vector2, numPoints as int, color as Color):
+def DrawLineStrip(ref points as Vector2, pointsCount as int, color as Color):
 	pass
 
 // Draw a color-filled circle
@@ -1882,7 +2058,7 @@ def DrawTriangleLines(v1 as Vector2, v2 as Vector2, v3 as Vector2, color as Colo
 
 // Draw a triangle fan defined by points (first vertex is the center)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawTriangleFan(ref points as Vector2, numPoints as int, color as Color):
+def DrawTriangleFan(ref points as Vector2, pointsCount as int, color as Color):
 	pass
 
 // Draw a triangle strip defined by points
@@ -1936,6 +2112,11 @@ def CheckCollisionPointCircle(point as Vector2, center as Vector2, radius as sin
 def CheckCollisionPointTriangle(point as Vector2, p1 as Vector2, p2 as Vector2, p3 as Vector2) as bool:
 	pass
 
+// Check the collision between two lines defined by two points each, returns collision point by reference
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def CheckCollisionLines(startPos1 as Vector2, endPos1 as Vector2, startPos2 as Vector2, endPos2 as Vector2, ref collisionPoint as Vector2) as bool:
+	pass
+
 //------------------------------------------------------------------------------------
 // Texture Loading and Drawing Functions (Module: textures)
 //------------------------------------------------------------------------------------
@@ -1945,6 +2126,11 @@ def CheckCollisionPointTriangle(point as Vector2, p1 as Vector2, p2 as Vector2, 
 // Load image from file into CPU memory (RAM)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def LoadImage(fileName as string) as Image:
+	pass
+
+// Load image from memory buffer, fileType refers to extension: i.e. "png"
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def LoadImageFromMemory(fileType as string, fileData as IntPtr, dataSize as int) as Image:
 	pass
 
 // Load image from Color array data (RGBA - 32bit)
@@ -1967,14 +2153,14 @@ def LoadImageRaw(fileName as string, width as int, height as int, format as int,
 def UnloadImage(image as Image):
 	pass
 
-// Export image data to file
+// Export image data to file, returns true on success
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def ExportImage(image as Image, fileName as string):
+def ExportImage(image as Image, fileName as string) as bool:
 	pass
 
-// Export image as code file defining an array of bytes
+// Export image as code file defining an array of bytes, returns true on success
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def ExportImageAsCode(image as Image, fileName as string):
+def ExportImageAsCode(image as Image, fileName as string) as bool:
 	pass
 
 // Get pixel data from image as a Color struct array
@@ -2337,7 +2523,7 @@ def DrawTextureEx(texture as Texture2D, position as Vector2, rotation as single,
 
 // Draw a part of a texture defined by a rectangle
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawTextureRec(texture as Texture2D, sourceRec as Rectangle, position as Vector2, tint as Color):
+def DrawTextureRec(texture as Texture2D, source as Rectangle, position as Vector2, tint as Color):
 	pass
 
 // Draw texture quad with tiling and offset parameters
@@ -2347,12 +2533,17 @@ def DrawTextureQuad(texture as Texture2D, tiling as Vector2, offset as Vector2, 
 
 // Draw a part of a texture defined by a rectangle with 'pro' parameters
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawTexturePro(texture as Texture2D, sourceRec as Rectangle, destRec as Rectangle, origin as Vector2, rotation as single, tint as Color):
+def DrawTexturePro(texture as Texture2D, source as Rectangle, dest as Rectangle, origin as Vector2, rotation as single, tint as Color):
+	pass
+
+// Draw part of a texture (defined by a rectangle) with rotation and scale tiled into dest.
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawTextureTiled(texture as Texture2D, source as Rectangle, dest as Rectangle, origin as Vector2, rotation as single, scale as single, tint as Color):
 	pass
 
 // Draws a texture (or part of it) that stretches or shrinks nicely
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawTextureNPatch(texture as Texture2D, nPatchInfo as NPatchInfo, destRec as Rectangle, origin as Vector2, rotation as single, tint as Color):
+def DrawTextureNPatch(texture as Texture2D, nPatchInfo as NPatchInfo, dest as Rectangle, origin as Vector2, rotation as single, tint as Color):
 	pass
 
 // Image/Texture misc functions
@@ -2375,7 +2566,17 @@ def GetFontDefault() as Font:
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def LoadFont(fileName as string) as Font:
 	pass
-	
+
+// Load font from memory buffer, fileType refers to extension: i.e. "ttf
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def LoadFontFromMemory(fileType as string, fileData as (byte), dataSize as int, fontSize as int, ref fontChars as int, charsCount as int) as Font:
+	pass
+
+// Unload font chars info data (RAM)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadFontData(ref chars as CharInfo, charsCount as int):
+	pass
+
 // Load font from file with extended parameters
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def LoadFontEx(fileName as string, fontSize as int, fontChars as (int), charsCount as int) as Font:
@@ -2454,7 +2655,7 @@ def DrawTextCodepoint(font as Font, codepoint as int, position as Vector2, scale
 
 // Draw one character (codepoint)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawTextCodepoint(font as SpriteFont, codepoint as int, position as Vector2, scale as single, tint as Color):
+def DrawTextCodepoint(font as SpriteFont, codepoint as int, position as Vector2, fontSize as single, tint as Color):
 	pass
 	
 // Text misc. functions
@@ -2694,9 +2895,14 @@ def LoadModel(fileName as string) as Model:
 def LoadModelFromMesh(mesh as Mesh) as Model:
 	pass
 
-// Unload model from memory (RAM and/or VRAM)
+// Unload model (including meshes) from memory (RAM and/or VRAM)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def UnloadModel(model as Model):
+	pass
+
+// Unload model (but not meshes) from memory (RAM and/or VRAM)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadModelKeepMeshes(model as Model):
 	pass
 
 // Mesh loading/unloading functions
@@ -2705,9 +2911,9 @@ def UnloadModel(model as Model):
 def LoadMeshes(fileName as string, ref meshCount as int) as (Mesh):
 	pass
 
-// Export mesh data to file
+// Export mesh data to file, returns true on success
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def ExportMesh(mesh as Mesh, fileName as string):
+def ExportMesh(mesh as Mesh, fileName as string) as bool:
 	pass
 
 // Unload mesh from memory (RAM and/or VRAM)
@@ -2865,20 +3071,20 @@ def DrawBillboard(camera as Camera, texture as Texture2D, center as Vector3, siz
 def DrawBillboard(camera as Camera3D, texture as Texture2D, center as Vector3, size as single, tint as Color):
 	pass
 	
-// Draw a billboard texture defined by sourceRec
+// Draw a billboard texture defined by source
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawBillboardRec(camera as Camera, texture as Texture2D, sourceRec as Rectangle, center as Vector3, size as single, tint as Color):
+def DrawBillboardRec(camera as Camera, texture as Texture2D, source as Rectangle, center as Vector3, size as single, tint as Color):
 	pass
 
-// Draw a billboard texture defined by sourceRec
+// Draw a billboard texture defined by source
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawBillboardRec(camera as Camera3D, texture as Texture2D, sourceRec as Rectangle, center as Vector3, size as single, tint as Color):
+def DrawBillboardRec(camera as Camera3D, texture as Texture2D, source as Rectangle, center as Vector3, size as single, tint as Color):
 	pass
 	
 // Collision detection functions
 // Detect collision between two spheres
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def CheckCollisionSpheres(centerA as Vector3, radiusA as single, centerB as Vector3, radiusB as single) as bool:
+def CheckCollisionSpheres(center1 as Vector3, radius1 as single, center2 as Vector3, radius2 as single) as bool:
 	pass
 
 // Detect collision between two bounding boxes
@@ -2906,6 +3112,11 @@ def CheckCollisionRaySphereEx(ray as Ray, center as Vector3, radius as single, r
 def CheckCollisionRayBox(ray as Ray, box as BoundingBox) as bool:
 	pass
 
+// Get collision info between ray and mesh
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetCollisionRayMesh(ray as Ray, mesh as Mesh, transform as Matrix) as RayHitInfo:
+	pass
+	
 // Get collision info between ray and model
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetCollisionRayModel(ray as Ray, model as Model) as RayHitInfo:
@@ -2973,6 +3184,11 @@ def SetShapesTexture(texture as Texture2D, source as Rectangle):
 def GetShaderLocation(shader as Shader, uniformName as string) as int:
 	pass
 
+// Get shader attribute location
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetShaderLocationAttrib(shader as Shader, attribName as int) as int: 
+	pass
+
 // Set shader uniform value
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def SetShaderValue(shader as Shader, uniformLoc as int, value as IntPtr, uniformType as int):
@@ -3025,19 +3241,19 @@ def GetMatrixProjection() as Matrix:
 
 // Texture maps generation (PBR)
 // NOTE: Required shaders should be provided
-// Generate cubemap texture from 2D texture
+// Generate cubemap texture from 2D panorama texture
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GenTextureCubemap(shader as Shader, map as Texture2D, size as int) as Texture2D:
+def GenTextureCubemap(shader as Shader, panorama as Texture2D, size as int, format as int) as TextureCubemap:
 	pass
 
 // Generate irradiance texture using cubemap data
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GenTextureIrradiance(shader as Shader, cubemap as Texture2D, size as int) as Texture2D:
+def GenTextureIrradiance(shader as Shader, cubemap as TextureCubemap, size as int) as TextureCubemap:
 	pass
 
 // Generate prefilter texture using cubemap data
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GenTexturePrefilter(shader as Shader, cubemap as Texture2D, size as int) as Texture2D:
+def GenTexturePrefilter(shader as Shader, cubemap as TextureCubemap, size as int) as TextureCubemap:
 	pass
 
 // Generate BRDF texture
@@ -3144,6 +3360,11 @@ def SetMasterVolume(volume as single):
 def LoadWave(fileName as string) as Wave:
 	pass
 
+// Load wave from memory buffer, fileType refers to extension: i.e. "wav"
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def LoadWaveFromMemory(fileType as string, fileData as (byte), dataSize as int) as Wave:
+	pass
+
 // Load sound from file
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def LoadSound(fileName as string) as Sound:
@@ -3169,14 +3390,14 @@ def UnloadWave(wave as Wave):
 def UnloadSound(sound as Sound):
 	pass
 
-// Export wave data to file
+// Export wave data to file, returns true on success
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def ExportWave(wave as Wave, fileName as string):
+def ExportWave(wave as Wave, fileName as string) as bool:
 	pass
 
-// Export wave sample data to code (.h)
+// Export wave sample data to code (.h), returns true on success
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def ExportWaveAsCode(wave as Wave, fileName as string):
+def ExportWaveAsCode(wave as Wave, fileName as string) as bool:
 	pass
 
 // Wave/Sound management functions
@@ -3245,9 +3466,14 @@ def WaveCopy(wave as Wave) as Wave:
 def WaveCrop(ref wave as Wave, initSample as int, finalSample as int):
 	pass
 
-// Get samples data from wave as a floats array
+// Load samples data from wave as a floats array
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetWaveData(wave as Wave) as (single):
+def LoadWaveSamples(wave as Wave) as (single):
+	pass
+
+// Unload samples data loaded with LoadWaveSamples()
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadWaveSamples(ref samples as single):
 	pass
 
 // Music management functions
@@ -3399,9 +3625,97 @@ def LoadText(fileName as string) as IntPtr:
 // RLGL
 //------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------
+// Types and Structures Definition
+//----------------------------------------------------------------------------------
+// Dynamic vertex buffers (position + texcoords + colors + indices arrays)
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
+public struct VertexBuffer:
+	elementsCount as int
+	vCounter as int
+	tcCounter as int
+	cCounter as int
+	
+	vertices as (single)
+	texcoords as (single)
+	colors as (byte)
+	
+	indices as (uint)
+	vaoId as (uint)
+	
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
+	vboId as (uint)
+	
+// Draw call type
+// NOTE: Only texture changes register a new draw, other state-change-related elements are not
+// used at this moment (vaoId, shaderId, matrices), raylib just forces a batch draw call if any
+// of those state-change happens (this is done in core module)
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
+public struct DrawCall:
+	mode as int
+	vertexCount as int
+	vertexAlignment as int
+	textureId as uint
+
+
+// RenderBatch type
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
+public struct RenderBatch:
+	buffersCount as int
+	currentBuffer as int
+	ref vertexBuffer as VertexBuffer
+	ref draws as DrawCall
+	drawsCounter as int
+	currentDepth as single
+
+// VR Stereo rendering configuration for simulator
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
+public struct VrStereoConfig:
+	distortionShader as Shader
+	
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	eyesProjection as (Matrix)
+	
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	eyesViewOffset as (Matrix)
+	
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
+	eyeViewportRight as (int)
+	
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
+	eyeViewportLeft as (int)
+
+//----------------------------------------------------------------------------------
 // Defines and Macros
 //----------------------------------------------------------------------------------
-public enum RLGLEnum:
+public enum GlVersion:
+	OPENGL_11 = 1
+	OPENGL_21
+	OPENGL_33
+	OPENGL_ES_20
+
+public enum FramebufferAttachType:
+	RL_ATTACHMENT_COLOR_CHANNEL0 = 0
+	RL_ATTACHMENT_COLOR_CHANNEL1
+	RL_ATTACHMENT_COLOR_CHANNEL2
+	RL_ATTACHMENT_COLOR_CHANNEL3
+	RL_ATTACHMENT_COLOR_CHANNEL4
+	RL_ATTACHMENT_COLOR_CHANNEL5
+	RL_ATTACHMENT_COLOR_CHANNEL6
+	RL_ATTACHMENT_COLOR_CHANNEL7
+	RL_ATTACHMENT_DEPTH = 100
+	RL_ATTACHMENT_STENCIL = 200
+
+public enum FramebufferTexType:
+	RL_ATTACHMENT_CUBEMAP_POSITIVE_X = 0
+	RL_ATTACHMENT_CUBEMAP_NEGATIVE_X
+	RL_ATTACHMENT_CUBEMAP_POSITIVE_Y
+	RL_ATTACHMENT_CUBEMAP_NEGATIVE_Y
+	RL_ATTACHMENT_CUBEMAP_POSITIVE_Z
+	RL_ATTACHMENT_CUBEMAP_NEGATIVE_Z
+	RL_ATTACHMENT_TEXTURE2D = 100
+	RL_ATTACHMENT_RENDERBUFFER = 200
+
+public enum RLGL:
 	// Default internal render batch limits
 	DEFAULT_BATCH_BUFFER_ELEMENTS   = 8192
 	DEFAULT_BATCH_BUFFERS           = 1        // Default number of batch buffers (multi-buffering)
@@ -3567,16 +3881,19 @@ def rlDisableTexture():
 def rlTextureParameters(id as uint, param as int, value as int):
 	pass
 
-// Enable render texture (fbo)
+// Enable shader program usage
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlEnableRenderTexture(id as uint):
+def rlEnableShader(id as uint):
 	pass
 
-// Disable render texture (fbo), return to default framebuffer
+// Disable shader program usage
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDisableRenderTexture():
+def rlDisableShader():
 	pass
 
+void rlEnableFramebuffer(unsigned int id);              // Enable render texture (fbo)
+	void rlDisableFramebuffer(void);                        // Disable render texture (fbo), return to default framebuffer
+	
 // Enable depth test
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlEnableDepthTest():
@@ -3585,6 +3902,16 @@ def rlEnableDepthTest():
 // Disable depth test
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlDisableDepthTest():
+	pass
+
+// Enable depth write
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableDepthMask():
+	pass
+
+// Disable depth write
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableDepthMask():
 	pass
 
 // Enable backface culling
@@ -3622,34 +3949,24 @@ def rlEnableWireMode():
 def rlDisableWireMode():
 	pass
 
-// Delete OpenGL texture from GPU
+// Set the line drawing width
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDeleteTextures(id as uint):
+def rlSetLineWidth(width as single):
 	pass
 
-// Delete render textures (fbo) from GPU
+// Get the line drawing width
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDeleteRenderTextures(target as RenderTexture2D):
+def rlGetLineWidth() as single:
 	pass
 
-// Delete render textures (fbo) from GPU
+// Enable line aliasing
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDeleteRenderTextures(target as RenderTexture):
-	pass
-	
-// Delete OpenGL shader program from GPU
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDeleteShader(id as uint):
+def rlEnableSmoothLines():
 	pass
 
-// Unload vertex data (VAO) from GPU memory
+// Disable line aliasing
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDeleteVertexArrays(id as uint):
-	pass
-
-// Unload vertex data (VBO) from GPU memory
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDeleteBuffers(id as uint):
+def rlDisableSmoothLines():
 	pass
 
 // Clear color buffer with color
@@ -3710,6 +4027,11 @@ def rlCheckBufferLimit(vCount as int) as bool:
 def rlSetDebugMarker(text as string):
 	pass
 
+// Set blending mode factor and equation (using OpenGL factors)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetBlendMode(glSrcFactor as int, glDstFactor as int, glEquation as int):
+	pass
+
 // Load OpenGL extensions
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlLoadExtensions(loader as IntPtr):
@@ -3717,7 +4039,7 @@ def rlLoadExtensions(loader as IntPtr):
 
 // Get world coordinates from screen coordinates
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlUnproject(source as Vector3, proj as Matrix, view as Matrix) as Vector3:
+def Vector3Unproject(source as Vector3, proj as Matrix, view as Matrix) as Vector3:
 	pass
 
 // Textures data management
@@ -3728,7 +4050,7 @@ def rlLoadTexture(data as IntPtr, width as int, height as int, format as int, mi
 
 // Load depth texture/renderbuffer (to be attached to fbo)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlLoadTextureDepth(width as int, height as int, bits as int, useRenderBuffer as bool) as uint:
+def rlLoadTextureDepth(width as int, height as int, useRenderBuffer as bool) as uint:
 	pass
 
 // Load texture cubemap
@@ -3766,20 +4088,25 @@ def rlReadTexturePixels(texture as Texture2D) as IntPtr:
 def rlReadScreenPixels(width as int, height as int) as (byte):
 	pass
 
-// Render texture management (fbo)
-// Load a render texture (with color and depth attachments)
+// Framebuffer management (fbo)
+// Load an empty framebuffer
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlLoadRenderTexture(width as int, height as int, format as int, depthBits as int, useDepthTexture as bool) as RenderTexture2D:
-	pass
-	
-// Attach texture/renderbuffer to an fbo
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlRenderTextureAttach(target as RenderTexture, id as uint, attachType as int):
+def rlLoadFramebuffer(int width, int height) as uint:
 	pass
 
-// Verify render texture is complete
+// Attach texture/renderbuffer to a framebuffer
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlRenderTextureComplete(target as RenderTexture) as bool:
+def rlFramebufferAttach(fboId as uint, texId as uint, attachType as int, texType as int):
+	pass
+
+// Verify framebuffer is complete
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlFramebufferComplete(id as uint) as bool:
+	pass
+
+// Delete framebuffer from GPU
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlUnloadFramebuffer(id as uint):
 	pass
 
 // Vertex data management
@@ -3803,6 +4130,11 @@ def rlUpdateMeshAt(mesh as Mesh, buffer as int, count as int, index as int):
 def rlDrawMesh(mesh as Mesh, material as Material, transform as Matrix):
 	pass
 
+// Draw a 3d mesh with material and transform
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDrawMeshInstanced(mesh as Mesh, material as Material, transforms as (Matrix), count as int):
+	pass
+	
 // Unload mesh data from CPU and GPU
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlUnloadMesh(mesh as Mesh):
