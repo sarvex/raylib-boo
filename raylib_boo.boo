@@ -1444,9 +1444,14 @@ def ColorFromHSV(hue as single, saturation as single, value as single) as Color:
 def GetColor(hexValue as int) as Color:
 	pass
 
-// Color fade-in or fade-out, alpha goes from 0.0f to 1.0f
+// Returns color with alpha applied, alpha goes from 0.0f to 1.0f
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def Fade(color as Color, alpha as single) as Color:
+	pass
+
+// Returns color with alpha applied, alpha goes from 0.0f to 1.0f
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def ColorAlpha(color as Color, alpha as single) as Color:
 	pass
 
 // Misc. functions
@@ -2165,7 +2170,7 @@ def ExportImageAsCode(image as Image, fileName as string) as bool:
 
 // Get pixel data from image as a Color struct array
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetImageData(image as Image) as IntPtr:
+def LoadImageColors(image as Image) as IntPtr:
 	pass
 
 // Get pixel data from image as Vector4 array (float normalized)
@@ -4703,3 +4708,17 @@ def EaseElasticOut(t as single, b as single, c as single, d as single) as single
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def EaseElasticInOut(t as single, b as single, c as single, d as single) as single:
 	pass
+
+// Temporal hack to avoid breaking old codebases using
+// deprecated raylib implementation of these functions
+def FormatText(text as string) as string:
+	return TextFormat(text)
+
+def LoadText(fileName) as string:
+	return LoadFileText(fileName)
+
+def GetExtension(fileName as string) as string:
+	return GetFileExtension(fileName)
+
+def GetImageData(image as Image) as IntPtr:
+	return LoadImageColors(image)
