@@ -1595,7 +1595,7 @@ def GetKeyPressed() as int:
 
 // Get char pressed (unicode), call it multiple times for chars queued
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetCharPressed() as char:
+def GetCharPressed() as int:
 	pass
 
 // Input-related functions: gamepads
@@ -2054,6 +2054,11 @@ def CheckCollisionLines(startPos1 as Vector2, endPos1 as Vector2, startPos2 as V
 def LoadImage(fileName as string) as Image:
 	pass
 
+// Load image sequence from file (frames appended to image.data)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def LoadImageAnim(fileName as string, ref frames as int) as Image:
+	pass
+
 // Load image from memory buffer, fileType refers to extension: i.e. "png"
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def LoadImageFromMemory(fileType as string, fileData as IntPtr, dataSize as int) as Image:
@@ -2091,12 +2096,22 @@ def ExportImageAsCode(image as Image, fileName as string) as bool:
 
 // Get pixel data from image as a Color struct array
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def LoadImageColors(image as Image) as IntPtr:
+def LoadImageColors(image as Image) as (Color):
 	pass
 
-// Get pixel data from image as Vector4 array (float normalized)
+// Get pixel data from image as a Color struct array
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetImageDataNormalized(image as Image) as IntPtr:
+def LoadImagePalette(image as Image, maxPaletteSize as int, ref colorsCount as int) as (Color):
+	pass
+
+// Unload color data loaded with LoadImageColors()
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadImageColors(colors as (Color)) as (Color):
+	pass
+
+// Unload colors palette loaded with LoadImagePalette()
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadImagePalette(colors as (Color)):
 	pass
 
 // Image generation functions
@@ -2515,7 +2530,7 @@ def LoadFontFromImage(image as Image, key as Color, firstChar as int) as Font:
 
 // Load font data for further use
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def LoadFontData(fileName as string, fontSize as int, fontChars as (int), charsCount as int, type as int) as IntPtr:
+def LoadFontData(ref fileData as (byte), dataSize as int, fontSize as int, fontChars as (int), charsCount as int, type as int) as IntPtr:
 	pass
 
 // Generate image font atlas using chars info
@@ -4721,7 +4736,7 @@ def LoadText(fileName) as string:
 def GetExtension(fileName as string) as string:
 	return GetFileExtension(fileName)
 
-def GetImageData(image as Image) as IntPtr:
+def GetImageData(image as Image) as (Color):
 	return LoadImageColors(image)
 
 // Get a piece of a text string
