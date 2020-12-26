@@ -1,6 +1,6 @@
 // Written by Rabia Alhaffar in 17/October/2020
 // raylib-boo, Single-file Boo bindings for raylib library!
-// Updated: 25/December/2020
+// Updated: 26/December/2020
 /**********************************************************************************************
 *
 *   raylib - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
@@ -76,22 +76,6 @@
 namespace raylib_boo
 import System
 import System.Runtime.InteropServices
-
-//----------------------------------------------------------------------------------
-// Some basic Defines
-//----------------------------------------------------------------------------------
-def PI() as single:
-	return 3.14159265358979323846f
-
-def DEG2RAD() as single:
-	return PI() / 180.0f
-
-def RAD2DEG() as single:
-	return 180.0f / PI()
-
-// Maximum number of touch points supported
-def MAX_TOUCH_POINTS() as int:
-	return 10
 
 //----------------------------------------------------------------------------------
 // Structures Definition
@@ -242,86 +226,6 @@ public struct Color:
 		g = System.Convert.ToByte(_g)
 		b = System.Convert.ToByte(_b)
 		a = System.Convert.ToByte(_a)
-
-// Some Basic Colors
-// NOTE: Custom raylib color palette for amazing visuals on WHITE background
-def LIGHTGRAY() as Color:
-	return Color(200, 200, 200, 255)
-
-def GRAY() as Color:
-	return Color(130, 130, 130, 255)
-	
-def DARKGRAY() as Color:
-	return Color(200, 200, 200, 255)
-	
-def YELLOW() as Color:
-	return Color(253, 249, 0, 255)
-
-def GOLD() as Color:
-	return Color(255, 203, 0, 255)
-	
-def ORANGE() as Color:
-	return Color(255, 161, 0, 255)
-	
-def PINK() as Color:
-	return Color(255, 109, 194, 255)
-
-def RED() as Color:
-	return Color(230, 41, 55, 255)
-
-def MAROON() as Color:
-	return Color(190, 33, 55, 255)
-	
-def GREEN() as Color:
-	return Color(0, 228, 48, 255)
-	
-def LIME() as Color:
-	return Color(0, 158, 47, 255)
-	
-def DARKGREEN() as Color:
-	return Color(0, 117, 44, 255)
-	
-def SKYBLUE() as Color:
-	return Color(102, 191, 255, 255)
-	
-def BLUE() as Color:
-	return Color(0, 121, 241, 255)
-	
-def DARKBLUE() as Color:
-	return Color(0, 82, 172, 255)
-	
-def PURPLE() as Color:
-	return Color(200, 122, 255, 255)
-	
-def VIOLET() as Color:
-	return Color(135, 60, 190, 255)
-	
-def DARKPURPLE() as Color:
-	return Color(112, 31, 126, 255)
-	
-def BEIGE() as Color:
-	return Color(211, 176, 131, 255)
-	
-def BROWN() as Color:
-	return Color(127, 106, 79, 255)
-	
-def DARKBROWN() as Color:
-	return Color(76, 63, 47, 255)
-	
-def WHITE() as Color:
-	return Color(255, 255, 255, 255)
-	
-def BLACK() as Color:
-	return Color(0, 0, 0, 255)
-	
-def BLANK() as Color:
-	return Color(0, 0, 0, 0)
-	
-def MAGENTA() as Color:
-	return Color(255, 0, 255, 255)
-	
-def RAYWHITE() as Color:
-	return Color(245, 245, 245, 255)
 	
 // Rectangle type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -404,6 +308,13 @@ public struct NPatchInfo:
 	right as int
 	bottom as int
 	type as int
+	
+	def constructor(_source as Rectangle, _left as int, _top as int, _right as int, _bottom as int, _type as int):
+		source = _source
+		left = _left
+		top = _top
+		right = _right
+		bottom = _bottom
 
 // Font character info
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -514,6 +425,11 @@ public struct MaterialMap:
 	texture as Texture2D
 	color as Color
 	value as single
+	
+	def constructor(_texture as Texture2D, _color as Color, _value as single):
+		texture = _texture
+		color = _color
+		value = _value
 
 // Material type (generic)
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -645,6 +561,18 @@ public struct VrDeviceInfo:
 	
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
 	chromaAbCorrection as (single)
+	
+	def constructor(_hResolution as int, _vResolution as int, _hScreenSize as single, _vScreenSize as single, _vScreenCenter as single, _eyeToScreenDistance as single, _lensSeparationDistance as single, _interpupillaryDistance as single, _lensDistortionValues as (single), _chromaAbCorrection as (single)):
+		hResolution = _hResolution
+		vResolution = _vResolution
+		hScreenSize = _hScreenSize
+		vScreenSize = _vScreenSize
+		vScreenCenter = _vScreenCenter
+		eyeToScreenDistance = _eyeToScreenDistance
+		lensSeparationDistance = _lensSeparationDistance
+		interpupillaryDistance = _interpupillaryDistance
+		lensDistortionValues = _lensDistortionValues
+		chromaAbCorrection = _chromaAbCorrection
 
 //----------------------------------------------------------------------------------
 // Enumerators Definition
@@ -1927,6 +1855,11 @@ def DrawLineEx(startPos as Vector2, endPos as Vector2, thick as single, color as
 // Draw a line using cubic-bezier curves in-out
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def DrawLineBezier(startPos as Vector2, endPos as Vector2, thick as single, color as Color):
+	pass
+
+//Draw line using quadratic bezier curves with a control point
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawLineBezierQuad(startPos as Vector2, endPos as Vector2, controlPos as Vector2, thick as single, color as Color):
 	pass
 
 // Draw lines sequence
@@ -4683,6 +4616,102 @@ def EaseElasticOut(t as single, b as single, c as single, d as single) as single
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def EaseElasticInOut(t as single, b as single, c as single, d as single) as single:
 	pass
+
+//----------------------------------------------------------------------------------
+// Some basic Defines
+//----------------------------------------------------------------------------------
+def PI() as single:
+	return 3.14159265358979323846f
+
+def DEG2RAD() as single:
+	return PI() / 180.0f
+
+def RAD2DEG() as single:
+	return 180.0f / PI()
+
+// Maximum number of touch points supported
+def MAX_TOUCH_POINTS() as int:
+	return 10
+
+// Some Basic Colors
+// NOTE: Custom raylib color palette for amazing visuals on WHITE background
+def LIGHTGRAY() as Color:
+	return Color(200, 200, 200, 255)
+
+def GRAY() as Color:
+	return Color(130, 130, 130, 255)
+	
+def DARKGRAY() as Color:
+	return Color(200, 200, 200, 255)
+	
+def YELLOW() as Color:
+	return Color(253, 249, 0, 255)
+
+def GOLD() as Color:
+	return Color(255, 203, 0, 255)
+	
+def ORANGE() as Color:
+	return Color(255, 161, 0, 255)
+	
+def PINK() as Color:
+	return Color(255, 109, 194, 255)
+
+def RED() as Color:
+	return Color(230, 41, 55, 255)
+
+def MAROON() as Color:
+	return Color(190, 33, 55, 255)
+	
+def GREEN() as Color:
+	return Color(0, 228, 48, 255)
+	
+def LIME() as Color:
+	return Color(0, 158, 47, 255)
+	
+def DARKGREEN() as Color:
+	return Color(0, 117, 44, 255)
+	
+def SKYBLUE() as Color:
+	return Color(102, 191, 255, 255)
+	
+def BLUE() as Color:
+	return Color(0, 121, 241, 255)
+	
+def DARKBLUE() as Color:
+	return Color(0, 82, 172, 255)
+	
+def PURPLE() as Color:
+	return Color(200, 122, 255, 255)
+	
+def VIOLET() as Color:
+	return Color(135, 60, 190, 255)
+	
+def DARKPURPLE() as Color:
+	return Color(112, 31, 126, 255)
+	
+def BEIGE() as Color:
+	return Color(211, 176, 131, 255)
+	
+def BROWN() as Color:
+	return Color(127, 106, 79, 255)
+	
+def DARKBROWN() as Color:
+	return Color(76, 63, 47, 255)
+	
+def WHITE() as Color:
+	return Color(255, 255, 255, 255)
+	
+def BLACK() as Color:
+	return Color(0, 0, 0, 255)
+	
+def BLANK() as Color:
+	return Color(0, 0, 0, 0)
+	
+def MAGENTA() as Color:
+	return Color(255, 0, 255, 255)
+	
+def RAYWHITE() as Color:
+	return Color(245, 245, 245, 255)
 
 // Temporal hack to avoid breaking old codebases using
 // deprecated raylib implementation of these functions
