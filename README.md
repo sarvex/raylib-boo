@@ -73,7 +73,7 @@ if IsKeyDown(KeyboardKey.KEY_A):
 	DrawText("ALERT!", 10, 10, 32, YELLOW())
 ```
 
-3. RLGL enum are now named as `RLGLEnum` (Since it's not named...)
+3. RLGL's only non-named `typedef enum` are named as `RLGL` (Since it's not named...), But other RLGL enums names kept...
 4. Currently as `TextFormat` and `FormatText` removed, Use `System.String.Format` function instead!
 
 ### Contribute
