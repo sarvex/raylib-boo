@@ -1,13 +1,14 @@
 // Written by Rabia Alhaffar in 17/October/2020
 // raylib-boo, Single-file Boo bindings for raylib library!
-// Updated: 26/December/2020
+// Updated: 27/April/2021
 /**********************************************************************************************
 *
 *   raylib - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
 *
 *   FEATURES:
 *       - NO external dependencies, all required libraries included with raylib
-*       - Multiplatform: Windows, Linux, FreeBSD, OpenBSD, NetBSD, DragonFly, MacOS, UWP, Android, Raspberry Pi, HTML5.
+*       - Multiplatform: Windows, Linux, FreeBSD, OpenBSD, NetBSD, DragonFly,
+*                        MacOS, Haiku, UWP, Android, Raspberry Pi, HTML5.
 *       - Written in plain C code (C99) in PascalCase/camelCase notation
 *       - Hardware accelerated with OpenGL (1.1, 2.1, 3.3 or ES2 - choose at compile)
 *       - Unique OpenGL abstraction layer (usable as standalone module): [rlgl]
@@ -15,7 +16,7 @@
 *       - Outstanding texture formats support, including compressed formats (DXT, ETC, ASTC)
 *       - Full 3d support for 3d Shapes, Models, Billboards, Heightmaps and more!
 *       - Flexible Materials system, supporting classic maps and PBR maps
-*       - Skeletal Animation support (CPU bones-based animation)
+*       - Animated 3D models supported (skeletal bones animation) (IQM, glTF)
 *       - Shaders support, including Model shaders and Postprocessing shaders
 *       - Powerful math module for Vector, Matrix and Quaternion operations: [raymath]
 *       - Audio loading and playing with streaming support (WAV, OGG, MP3, FLAC, XM, MOD)
@@ -23,17 +24,20 @@
 *       - Bindings to multiple programming languages available!
 *
 *   NOTES:
-*       One custom font is loaded by default when InitWindow() [core]
-*       If using OpenGL 3.3 or ES2, one default shader is loaded automatically (internally defined) [rlgl]
-*       If using OpenGL 3.3 or ES2, several vertex buffers (VAO/VBO) are created to manage lines-triangles-quads
+*       One default Font is loaded on InitWindow()->LoadFontDefault() [core, text]
+*       One default Texture2D is loaded on rlglInit() [rlgl] (OpenGL 3.3 or ES2)
+*       One default Shader is loaded on rlglInit()->rlLoadShaderDefault() [rlgl] (OpenGL 3.3 or ES2)
+*       One default RenderBatch is loaded on rlglInit()->rlLoadRenderBatch() [rlgl] (OpenGL 3.3 or ES2)
 *
 *   DEPENDENCIES (included):
-*       [core] rglfw (github.com/glfw/glfw) for window/context management and input (only PLATFORM_DESKTOP)
-*       [rlgl] glad (github.com/Dav1dde/glad) for OpenGL 3.3 extensions loading (only PLATFORM_DESKTOP)
-*       [raudio] miniaudio (github.com/dr-soft/miniaudio) for audio device/context management
+*       [core] rglfw (Camilla Löwy - github.com/glfw/glfw) for window/context management and input (PLATFORM_DESKTOP)
+*       [rlgl] glad (David Herberth - github.com/Dav1dde/glad) for OpenGL 3.3 extensions loading (PLATFORM_DESKTOP)
+*       [raudio] miniaudio (David Reid - github.com/dr-soft/miniaudio) for audio device/context management
 *
 *   OPTIONAL DEPENDENCIES (included):
-*       [core] rgif (Charlie Tangora, Ramon Santamaria) for GIF recording
+*       [core] msf_gif (Miles Fogle) for GIF recording
+*       [core] sinfl (Micha Mettke) for DEFLATE decompression algorythm
+*       [core] sdefl (Micha Mettke) for DEFLATE compression algorythm
 *       [textures] stb_image (Sean Barret) for images loading (BMP, TGA, PNG, JPEG, HDR...)
 *       [textures] stb_image_write (Sean Barret) for image writting (BMP, TGA, PNG, JPG)
 *       [textures] stb_image_resize (Sean Barret) for image resizing algorithms
@@ -43,9 +47,10 @@
 *       [models] par_shapes (Philip Rideout) for parametric 3d shapes generation
 *       [models] tinyobj_loader_c (Syoyo Fujita) for models loading (OBJ, MTL)
 *       [models] cgltf (Johannes Kuhlmann) for models loading (glTF)
-*       [raudio] stb_vorbis (Sean Barret) for OGG audio loading
+*       [raudio] dr_wav (David Reid) for WAV audio file loading
 *       [raudio] dr_flac (David Reid) for FLAC audio file loading
 *       [raudio] dr_mp3 (David Reid) for MP3 audio file loading
+*       [raudio] stb_vorbis (Sean Barret) for OGG audio loading
 *       [raudio] jar_xm (Joshua Reisenauer) for XM audio module loading
 *       [raudio] jar_mod (Joshua Reisenauer) for MOD audio module loading
 *
@@ -55,7 +60,7 @@
 *   raylib is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software:
 *
-*   Copyright (c) 2013-2020 Ramon Santamaria (@raysan5)
+*   Copyright (c) 2013-2021 Ramon Santamaria (@raysan5)
 *
 *   This software is provided "as-is", without any express or implied warranty. In no event
 *   will the authors be held liable for any damages arising from the use of this software.
@@ -315,6 +320,7 @@ public struct NPatchInfo:
 		top = _top
 		right = _right
 		bottom = _bottom
+		type = _type
 
 // Font character info
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -340,6 +346,7 @@ public struct Font:
 public struct SpriteFont:
 	baseSize as int
 	charsCount as int
+	charsPadding as int
 	texture as Texture2D
 	recs as IntPtr
 	chars as IntPtr
@@ -351,14 +358,14 @@ public struct Camera3D:
 	target as Vector3
 	up as Vector3
 	fovy as single
-	type as int
+	projection as int
 	
-	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as single, _type as int):
+	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as single, _projection as int):
 		position = _position
 		target = _target
 		up = _up
 		fovy = _fovy
-		type = _type
+		projection = _projection
 
 // Camera type fallback, defaults to Camera3D
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -367,14 +374,14 @@ public struct Camera:
 	target as Vector3
 	up as Vector3
 	fovy as single
-	type as int
+	projection as int
 	
-	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as single, _type as int):
+	def constructor(_position as Vector3, _target as Vector3, _up as Vector3, _fovy as single, _projection as int):
 		position = _position
 		target = _target
 		up = _up
 		fovy = _fovy
-		type = _type
+		projection = _projection
 
 // Camera2D type, defines a 2d camera
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -436,7 +443,9 @@ public struct MaterialMap:
 public struct Material:
 	shader as Shader
 	maps as IntPtr
-	params as IntPtr
+    
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
+	params as (single)
 
 // Transformation properties
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
@@ -573,6 +582,33 @@ public struct VrDeviceInfo:
 		interpupillaryDistance = _interpupillaryDistance
 		lensDistortionValues = _lensDistortionValues
 		chromaAbCorrection = _chromaAbCorrection
+
+// VR Stereo rendering configuration for simulator
+[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
+public struct VrStereoConfig:
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	projection as (Matrix)
+    
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	viewOffset as (Matrix)
+    
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	leftLensCenter as (single)
+    
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	rightLensCenter as (single)
+    
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	leftScreenCenter as (single)
+	
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	rightScreenCenter as (single)
+	
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	scale as (single) 
+	
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
+	scaleIn as (single)
 
 //----------------------------------------------------------------------------------
 // Enumerators Definition
@@ -720,6 +756,12 @@ public enum KeyboardKey:
 	KEY_KP_ADD          = 334
 	KEY_KP_ENTER        = 335
 	KEY_KP_EQUAL        = 336
+    
+	// Android key buttons
+	KEY_BACK            = 4
+	KEY_MENU            = 82
+	KEY_VOLUME_UP       = 24
+	KEY_VOLUME_DOWN     = 25
 
 // Mouse cursor types
 public enum MouseCursor:
@@ -734,26 +776,12 @@ public enum MouseCursor:
 	MOUSE_CURSOR_RESIZE_NESW   = 8     // The top-right to bottom-left diagonal resize/move arrow shape
 	MOUSE_CURSOR_RESIZE_ALL    = 9     // The omni-directional resize/move cursor shape
 	MOUSE_CURSOR_NOT_ALLOWED   = 10    // The operation-not-allowed shape
-	
-// Android buttons
-public enum AndroidButton:
-	KEY_BACK            = 4
-	KEY_MENU            = 82
-	KEY_VOLUME_UP       = 24
-	KEY_VOLUME_DOWN     = 25
 
 // Mouse buttons
 public enum MouseButton:
 	MOUSE_LEFT_BUTTON   = 0
 	MOUSE_RIGHT_BUTTON  = 1
 	MOUSE_MIDDLE_BUTTON = 2
-
-// Gamepad number
-public enum GamepadNumber:
-	GAMEPAD_PLAYER1     = 0
-	GAMEPAD_PLAYER2     = 1
-	GAMEPAD_PLAYER3     = 2
-	GAMEPAD_PLAYER4     = 3
 
 // Gamepad buttons
 public enum GamepadButton:
@@ -791,130 +819,131 @@ public enum GamepadButton:
 	GAMEPAD_BUTTON_RIGHT_THUMB
 
 public enum GamepadAxis:
-	// This is here just for error checking
-	GAMEPAD_AXIS_UNKNOWN = 0
-
 	// Left stick
-	GAMEPAD_AXIS_LEFT_X
-	GAMEPAD_AXIS_LEFT_Y
+	GAMEPAD_AXIS_LEFT_X = 0
+	GAMEPAD_AXIS_LEFT_Y = 1
 
 	// Right stick
-	GAMEPAD_AXIS_RIGHT_X
-	GAMEPAD_AXIS_RIGHT_Y
+	GAMEPAD_AXIS_RIGHT_X = 2
+	GAMEPAD_AXIS_RIGHT_Y = 3
 
 	// Pressure levels for the back triggers
-	GAMEPAD_AXIS_LEFT_TRIGGER      // [1..-1] (pressure-level)
-	GAMEPAD_AXIS_RIGHT_TRIGGER     // [1..-1] (pressure-level)
+	GAMEPAD_AXIS_LEFT_TRIGGER = 4      // [1..-1] (pressure-level)
+	GAMEPAD_AXIS_RIGHT_TRIGGER = 5     // [1..-1] (pressure-level)
 
 // Shader location points
 public enum ShaderLocationIndex:
-	LOC_VERTEX_POSITION = 0
-	LOC_VERTEX_TEXCOORD01
-	LOC_VERTEX_TEXCOORD02
-	LOC_VERTEX_NORMAL
-	LOC_VERTEX_TANGENT
-	LOC_VERTEX_COLOR
-	LOC_MATRIX_MVP
-	LOC_MATRIX_MODEL
-	LOC_MATRIX_VIEW
-	LOC_MATRIX_PROJECTION
-	LOC_VECTOR_VIEW
-	LOC_COLOR_DIFFUSE
-	LOC_COLOR_SPECULAR
-	LOC_COLOR_AMBIENT
-	LOC_MAP_ALBEDO          // LOC_MAP_DIFFUSE
-	LOC_MAP_METALNESS       // LOC_MAP_SPECULAR
-	LOC_MAP_NORMAL
-	LOC_MAP_ROUGHNESS
-	LOC_MAP_OCCLUSION
-	LOC_MAP_EMISSION
-	LOC_MAP_HEIGHT
-	LOC_MAP_CUBEMAP
-	LOC_MAP_IRRADIANCE
-	LOC_MAP_PREFILTER
-	LOC_MAP_BRDF
-	LOC_MAP_DIFFUSE  = LOC_MAP_ALBEDO
-	LOC_MAP_SPECULAR = LOC_MAP_METALNESS
+	SHADER_LOC_VERTEX_POSITION = 0
+	SHADER_LOC_VERTEX_TEXCOORD01
+	SHADER_LOC_VERTEX_TEXCOORD02
+	SHADER_LOC_VERTEX_NORMAL
+	SHADER_LOC_VERTEX_TANGENT
+	SHADER_LOC_VERTEX_COLOR
+	SHADER_LOC_MATRIX_MVP
+	SHADER_LOC_MATRIX_MODEL
+	SHADER_LOC_MATRIX_VIEW
+	SHADER_LOC_MATRIX_PROJECTION
+	SHADER_LOC_VECTOR_VIEW
+	SHADER_LOC_COLOR_DIFFUSE
+	SHADER_LOC_COLOR_SPECULAR
+	SHADER_LOC_COLOR_AMBIENT
+	SHADER_LOC_MAP_ALBEDO          // SHADER_LOC_MAP_DIFFUSE
+	SHADER_LOC_MAP_METALNESS       // SHADER_LOC_MAP_SPECULAR
+	SHADER_LOC_MAP_NORMAL
+	SHADER_LOC_MAP_ROUGHNESS
+	SHADER_LOC_MAP_OCCLUSION
+	SHADER_LOC_MAP_EMISSION
+	SHADER_LOC_MAP_HEIGHT
+	SHADER_LOC_MAP_CUBEMAP
+	SHADER_LOC_MAP_IRRADIANCE
+	SHADER_LOC_MAP_PREFILTER
+	SHADER_LOC_MAP_BRDF
+	SHADER_LOC_MAP_DIFFUSE  = SHADER_LOC_MAP_ALBEDO
+	SHADER_LOC_MAP_SPECULAR = SHADER_LOC_MAP_METALNESS
 
 // Shader uniform data types
 public enum ShaderUniformDataType:
-	UNIFORM_FLOAT = 0
-	UNIFORM_VEC2
-	UNIFORM_VEC3
-	UNIFORM_VEC4
-	UNIFORM_INT
-	UNIFORM_IVEC2
-	UNIFORM_IVEC3
-	UNIFORM_IVEC4
-	UNIFORM_SAMPLER2D
+	SHADER_UNIFORM_FLOAT = 0
+	SHADER_UNIFORM_VEC2
+	SHADER_UNIFORM_VEC3
+	SHADER_UNIFORM_VEC4
+	SHADER_UNIFORM_INT
+	SHADER_UNIFORM_IVEC2
+	SHADER_UNIFORM_IVEC3
+	SHADER_UNIFORM_IVEC4
+	SHADER_UNIFORM_SAMPLER2D
 
 // Material maps
 public enum MaterialMapType:
-	MAP_ALBEDO    = 0       // MAP_DIFFUSE
-	MAP_METALNESS = 1       // MAP_SPECULAR
-	MAP_NORMAL    = 2
-	MAP_ROUGHNESS = 3
-	MAP_OCCLUSION
-	MAP_EMISSION
-	MAP_HEIGHT
-	MAP_CUBEMAP             // NOTE: Uses GL_TEXTURE_CUBE_MAP
-	MAP_IRRADIANCE          // NOTE: Uses GL_TEXTURE_CUBE_MAP
-	MAP_PREFILTER           // NOTE: Uses GL_TEXTURE_CUBE_MAP
-	MAP_BRDF
-	MAP_DIFFUSE     = MAP_ALBEDO
-	MAP_SPECULAR    = MAP_METALNESS
+	MATERIAL_MAP_ALBEDO    = 0       // MATERIAL_MAP_DIFFUSE
+	MATERIAL_MAP_METALNESS = 1       // MATERIAL_MAP_SPECULAR
+	MATERIAL_MAP_NORMAL    = 2
+	MATERIAL_MAP_ROUGHNESS = 3
+	MATERIAL_MAP_OCCLUSION
+	MATERIAL_MAP_EMISSION
+	MATERIAL_MAP_HEIGHT
+	MATERIAL_MAP_CUBEMAP             // NOTE: Uses GL_TEXTURE_CUBE_MAP
+	MATERIAL_MAP_IRRADIANCE          // NOTE: Uses GL_TEXTURE_CUBE_MAP
+	MATERIAL_MAP_PREFILTER           // NOTE: Uses GL_TEXTURE_CUBE_MAP
+	MATERIAL_MAP_BRDF
+	MATERIAL_MAP_DIFFUSE     = MATERIAL_MAP_ALBEDO
+	MATERIAL_MAP_SPECULAR    = MATERIAL_MAP_METALNESS
+	MAP_DIFFUSE              = MATERIAL_MAP_DIFFUSE
 
 // Pixel formats
 // NOTE: Support depends on OpenGL version and platform
 public enum PixelFormat:
-	UNCOMPRESSED_GRAYSCALE = 1     // 8 bit per pixel (no alpha)
-	UNCOMPRESSED_GRAY_ALPHA        // 8*2 bpp (2 channels)
-	UNCOMPRESSED_R5G6B5            // 16 bpp
-	UNCOMPRESSED_R8G8B8            // 24 bpp
-	UNCOMPRESSED_R5G5B5A1          // 16 bpp (1 bit alpha)
-	UNCOMPRESSED_R4G4B4A4          // 16 bpp (4 bit alpha)
-	UNCOMPRESSED_R8G8B8A8          // 32 bpp
-	UNCOMPRESSED_R32               // 32 bpp (1 channel - float)
-	UNCOMPRESSED_R32G32B32         // 32*3 bpp (3 channels - float)
-	UNCOMPRESSED_R32G32B32A32      // 32*4 bpp (4 channels - float)
-	COMPRESSED_DXT1_RGB            // 4 bpp (no alpha)
-	COMPRESSED_DXT1_RGBA           // 4 bpp (1 bit alpha)
-	COMPRESSED_DXT3_RGBA           // 8 bpp
-	COMPRESSED_DXT5_RGBA           // 8 bpp
-	COMPRESSED_ETC1_RGB            // 4 bpp
-	COMPRESSED_ETC2_RGB            // 4 bpp
-	COMPRESSED_ETC2_EAC_RGBA       // 8 bpp
-	COMPRESSED_PVRT_RGB            // 4 bpp
-	COMPRESSED_PVRT_RGBA           // 4 bpp
-	COMPRESSED_ASTC_4x4_RGBA       // 8 bpp
-	COMPRESSED_ASTC_8x8_RGBA       // 2 bpp
+	PIXELFORMAT_UNCOMPRESSED_GRAYSCALE = 1     // 8 bit per pixel (no alpha)
+	PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA        // 8*2 bpp (2 channels)
+	PIXELFORMAT_UNCOMPRESSED_R5G6B5            // 16 bpp
+	PIXELFORMAT_UNCOMPRESSED_R8G8B8            // 24 bpp
+	PIXELFORMAT_UNCOMPRESSED_R5G5B5A1          // 16 bpp (1 bit alpha)
+	PIXELFORMAT_UNCOMPRESSED_R4G4B4A4          // 16 bpp (4 bit alpha)
+	PIXELFORMAT_UNCOMPRESSED_R8G8B8A8          // 32 bpp
+	PIXELFORMAT_UNCOMPRESSED_R32               // 32 bpp (1 channel - float)
+	PIXELFORMAT_UNCOMPRESSED_R32G32B32         // 32*3 bpp (3 channels - float)
+	PIXELFORMAT_UNCOMPRESSED_R32G32B32A32      // 32*4 bpp (4 channels - float)
+	PIXELFORMAT_COMPRESSED_DXT1_RGB            // 4 bpp (no alpha)
+	PIXELFORMAT_COMPRESSED_DXT1_RGBA           // 4 bpp (1 bit alpha)
+	PIXELFORMAT_COMPRESSED_DXT3_RGBA           // 8 bpp
+	PIXELFORMAT_COMPRESSED_DXT5_RGBA           // 8 bpp
+	PIXELFORMAT_COMPRESSED_ETC1_RGB            // 4 bpp
+	PIXELFORMAT_COMPRESSED_ETC2_RGB            // 4 bpp
+	PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA       // 8 bpp
+	PIXELFORMAT_COMPRESSED_PVRT_RGB            // 4 bpp
+	PIXELFORMAT_COMPRESSED_PVRT_RGBA           // 4 bpp
+	PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA       // 8 bpp
+	PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA       // 2 bpp
+	UNCOMPRESSED_R8G8B8A8 = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
 
 // Texture parameters: filter mode
 // NOTE 1: Filtering considers mipmaps if available in the texture
 // NOTE 2: Filter is accordingly set for minification and magnification
 public enum TextureFilterMode:
-	FILTER_POINT = 0               // No filter, just pixel aproximation
-	FILTER_BILINEAR                // Linear filtering
-	FILTER_TRILINEAR               // Trilinear filtering (linear with mipmaps)
-	FILTER_ANISOTROPIC_4X          // Anisotropic filtering 4x
-	FILTER_ANISOTROPIC_8X          // Anisotropic filtering 8x
-	FILTER_ANISOTROPIC_16X         // Anisotropic filtering 16x
+	TEXTURE_FILTER_POINT = 0               // No filter, just pixel aproximation
+	TEXTURE_FILTER_BILINEAR                // Linear filtering
+	TEXTURE_FILTER_TRILINEAR               // Trilinear filtering (linear with mipmaps)
+	TEXTURE_FILTER_ANISOTROPIC_4X          // Anisotropic filtering 4x
+	TEXTURE_FILTER_ANISOTROPIC_8X          // Anisotropic filtering 8x
+	TEXTURE_FILTER_ANISOTROPIC_16X         // Anisotropic filtering 16x
+	FILTER_POINT = TEXTURE_FILTER_POINT
+	FILTER_BILINEAR = TEXTURE_FILTER_BILINEAR
 
 // Texture parameters: wrap mode
 public enum TextureWrapMode:
-	WRAP_REPEAT = 0        	// Repeats texture in tiled mode
-	WRAP_CLAMP             	// Clamps texture to edge pixel in tiled mode
-	WRAP_MIRROR_REPEAT     	// Mirrors and repeats the texture in tiled mode
-	WRAP_MIRROR_CLAMP       // Mirrors and clamps to border the texture in tiled mode
+	TEXTURE_WRAP_REPEAT = 0        	// Repeats texture in tiled mode
+	TEXTURE_WRAP_CLAMP             	// Clamps texture to edge pixel in tiled mode
+	TEXTURE_WRAP_MIRROR_REPEAT     	// Mirrors and repeats the texture in tiled mode
+	TEXTURE_WRAP_MIRROR_CLAMP       // Mirrors and clamps to border the texture in tiled mode
 
 // Cubemap layouts
 public enum CubemapLayoutType:
-	CUBEMAP_AUTO_DETECT = 0        // Automatically detect layout type
-	CUBEMAP_LINE_VERTICAL          // Layout is defined by a vertical line with faces
-	CUBEMAP_LINE_HORIZONTAL        // Layout is defined by an horizontal line with faces
-	CUBEMAP_CROSS_THREE_BY_FOUR    // Layout is defined by a 3x4 cross with cubemap faces
-	CUBEMAP_CROSS_FOUR_BY_THREE    // Layout is defined by a 4x3 cross with cubemap faces
-	CUBEMAP_PANORAMA               // Layout is defined by a panorama image (equirectangular map)
+	CUBEMAP_LAYOUT_AUTO_DETECT = 0        // Automatically detect layout type
+	CUBEMAP_LAYOUT_LINE_VERTICAL          // Layout is defined by a vertical line with faces
+	CUBEMAP_LAYOUT_LINE_HORIZONTAL        // Layout is defined by an horizontal line with faces
+	CUBEMAP_LAYOUT_CROSS_THREE_BY_FOUR    // Layout is defined by a 3x4 cross with cubemap faces
+	CUBEMAP_LAYOUT_CROSS_FOUR_BY_THREE    // Layout is defined by a 4x3 cross with cubemap faces
+	CUBEMAP_LAYOUT_PANORAMA               // Layout is defined by a panorama image (equirectangular map)
 
 // Font type, defines generation method
 public enum FontType:
@@ -955,15 +984,15 @@ public enum CameraMode:
 	CAMERA_THIRD_PERSON
 
 // Camera projection modes
-public enum CameraType:
+public enum CameraProjection:
 	CAMERA_PERSPECTIVE = 0
 	CAMERA_ORTHOGRAPHIC
 
 // N-patch types
 public enum NPatchType:
-	NPT_9PATCH = 0         // Npatch defined by 3x3 tiles
-	NPT_3PATCH_VERTICAL    // Npatch defined by 1x3 tiles
-	NPT_3PATCH_HORIZONTAL  // Npatch defined by 3x1 tiles
+	NPATCH_NINE_PATCH = 0              // Npatch layout: 3x3 tiles
+	NPATCH_THREE_PATCH_VERTICAL        // Npatch layout: 1x3 tiles
+	NPATCH_THREE_PATCH_HORIZONTAL      // Npatch layout: 3x1 tiles
 
 //------------------------------------------------------------------------------------
 // Global Variables Definition
@@ -1114,6 +1143,11 @@ def GetScreenHeight() as int:
 def GetMonitorCount() as int:
 	pass
 
+// Get current connected monitor
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetCurrentMonitor() as int:
+	pass
+
 // Get specified monitor position
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetMonitorPosition(monitor as int) as Vector2:
@@ -1139,9 +1173,19 @@ def GetMonitorPhysicalWidth(monitor as int):
 def GetMonitorPhysicalHeight(monitor as int):
 	pass
 
+// Get specified monitor refresh rate
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetMonitorRefreshRate(monitor as int) as int:
+	pass
+
 // Get window position XY on monitor
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetWindowPosition() as Vector2:
+	pass
+
+// Get window scale DPI factor
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def GetWindowScaleDPI() as Vector2:
 	pass
 
 // Get the human-readable, UTF-8 encoded name of the specified monitor
@@ -1183,6 +1227,11 @@ def EnableCursor():
 // Disables cursor (lock cursor)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def DisableCursor():
+	pass
+
+// Check if cursor is on the current screen.
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def IsCursorOnScreen() as bool:
 	pass
 
 // Drawing-related functions
@@ -1249,6 +1298,27 @@ def BeginScissorMode(x as int, y as int, width as int, height as int):
 // End scissor mode
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def EndScissorMode():
+	pass
+
+// Begin stereo rendering (requires VR simulator)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def BeginVrStereoMode(config as VrStereoConfig):
+	pass
+
+// End stereo rendering (requires VR simulator)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def EndVrStereoMode():
+	pass
+
+// VR stereo config functions for VR simulator
+// Load VR stereo config for VR simulator device parameters
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def LoadVrStereoConfig(device as VrDeviceInfo) as VrStereoConfig:
+	pass
+
+// Unload VR stereo config
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadVrStereoConfig(config as VrStereoConfig):
 	pass
 
 // Screen-space-related functions
@@ -1384,11 +1454,6 @@ def SetConfigFlags(flags as uint) as int:
 // Set the current threshold (minimum) log level
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def SetTraceLogLevel(logType as int):
-	pass
-
-// Set the exit threshold (minimum) log level
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SetTraceLogExit(logType as int):
 	pass
 
 // Set a trace log callback to enable custom logging
@@ -1649,6 +1714,11 @@ def GetGamepadAxisCount(gamepad as int) as int:
 def GetGamepadAxisMovement(gamepad as int, axis as int) as single:
 	pass
 
+// Set internal gamepad mappings (SDL_GameControllerDB)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def SetGamepadMappings(mappings as string) as int:
+	pass
+
 // Input-related functions: mouse
 // Detect if a mouse button has been pressed once
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
@@ -1703,11 +1773,6 @@ def SetMouseScale(scaleX as single, scaleY as single):
 // Returns mouse wheel movement Y
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def GetMouseWheelMove() as single:
-	pass
-
-// Returns mouse cursor if (MouseCursor enum)
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetMouseCursor() as int:
 	pass
 
 // Set mouse cursor
@@ -2487,6 +2552,11 @@ def DrawTextureTiled(texture as Texture2D, source as Rectangle, dest as Rectangl
 def DrawTextureNPatch(texture as Texture2D, nPatchInfo as NPatchInfo, dest as Rectangle, origin as Vector2, rotation as single, tint as Color):
 	pass
 
+// Draw a textured polygon
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawTexturePoly(texture as Texture2D, center as Vector2, points as (Vector2), texcoords as (Vector2), pointsCount as int, tint as Color) as void:
+	pass
+
 // Image/Texture misc functions
 // Get pixel data size in bytes (image or texture)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
@@ -2811,13 +2881,6 @@ def DrawRay(ray as Ray, color as Color):
 def DrawGrid(slices as int, spacing as single):
 	pass
 
-// Draw simple gizmo
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def DrawGizmo(position as Vector3):
-	pass  
-
-//DrawTorus(), DrawTeapot() could be useful?
-
 //------------------------------------------------------------------------------------
 // Model 3d Loading and Drawing Functions (Module: models)
 //------------------------------------------------------------------------------------
@@ -2844,9 +2907,24 @@ def UnloadModelKeepMeshes(model as Model):
 	pass
 
 // Mesh loading/unloading functions
-// Load meshes from model file
+// Upload vertex data into GPU and provided VAO/VBO ids
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def LoadMeshes(fileName as string, ref meshCount as int) as (Mesh):
+def UploadMesh(ref mesh as Mesh, dynamic as bool):
+	pass
+
+// Update mesh vertex data in GPU for a specific buffer index
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UpdateMeshBuffer(mesh as Mesh, index as int, data as IntPtr, dataSize as int, offset as int):
+	pass
+
+// Draw a 3d mesh with material and transform
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawMesh(mesh as Mesh, material as Material, transform as Matrix):
+	pass
+
+// Draw multiple mesh instances with material and different transforms
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def DrawMeshInstanced(mesh as Mesh, material as Material, transforms as (Matrix), instances as int):
 	pass
 
 // Export mesh data to file, returns true on success
@@ -2899,6 +2977,11 @@ def UpdateModelAnimation(model as Model, anim as ModelAnimation, frame as int):
 // Unload animation data
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def UnloadModelAnimation(anim as ModelAnimation):
+	pass
+
+// Unload animation array data
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def UnloadModelAnimations(animations as (ModelAnimation), count as uint):
 	pass
 
 // Check model animation skeleton match
@@ -3083,7 +3166,7 @@ def LoadShader(vsFileName as string, fsFileName as string) as Shader:
 
 // Load shader from code strings and bind default locations
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def LoadShaderCode(vsCode as string, fsCode as string) as Shader:
+def LoadShaderFromMemory(vsCode as string, fsCode as string) as Shader:
 	pass
 
 // Unload shader from GPU memory (VRAM)
@@ -3093,22 +3176,12 @@ def UnloadShader(shader as Shader):
 
 // Get default shader
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetShaderDefault() as Shader:
+def rlGetShaderDefault() as Shader:
 	pass
 
 // Get default texture
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetTextureDefault() as Texture2D:
-	pass
-
-// Get texture to draw shapes
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetShapesTexture() as Texture2D:
-	pass
-
-// Get texture rectangle to draw shapes
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetShapesTextureRec() as Rectangle:
+def rlGetTextureDefault() as Texture2D:
 	pass
 
 // Define default texture used to draw shapes
@@ -3159,44 +3232,58 @@ def SetShaderValueTexture(shader as Shader, uniformLoc as int, texture as Textur
 
 // Set a custom projection matrix (replaces internal projection matrix)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SetMatrixProjection(proj as Matrix):
+def rlSetMatrixProjection(proj as Matrix):
 	pass
 
 // Set a custom modelview matrix (replaces internal modelview matrix)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SetMatrixModelview(view as Matrix):
+def rlSetMatrixModelview(view as Matrix):
+	pass
+
+// Set eyes projection matrices for stereo rendering
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetMatrixProjectionStereo(right as Matrix, left as Matrix):
+	pass
+
+// Set eyes view offsets matrices for stereo rendering
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetMatrixViewOffsetStereo(right as Matrix, left as Matrix):
+	pass
+
+// Quick and dirty cube/quad buffers load->draw->unload
+// Load and draw a cube
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlLoadDrawCube():
+	pass
+
+// Load and draw a quad
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlLoadDrawQuad():
 	pass
 
 // Get internal modelview matrix
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetMatrixModelview() as Matrix:
+def rlGetMatrixModelview() as Matrix:
 	pass
 
 // Get internal projection matrix
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GetMatrixProjection() as Matrix:
+def rlGetMatrixProjection() as Matrix:
 	pass
 
-// Texture maps generation (PBR)
-// NOTE: Required shaders should be provided
-// Generate cubemap texture from 2D panorama texture
+// Get internal accumulated transform matrix
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GenTextureCubemap(shader as Shader, panorama as Texture2D, size as int, format as int) as TextureCubemap:
+def rlGetMatrixTransform() as Matrix:
 	pass
 
-// Generate irradiance texture using cubemap data
+// Get internal projection matrix for stereo render (selected eye)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GenTextureIrradiance(shader as Shader, cubemap as TextureCubemap, size as int) as TextureCubemap:
+def rlGetMatrixProjectionStereo(eye as int) as Matrix:
 	pass
 
-// Generate prefilter texture using cubemap data
+// Get internal view offset matrix for stereo render (selected eye)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GenTexturePrefilter(shader as Shader, cubemap as TextureCubemap, size as int) as TextureCubemap:
-	pass
-
-// Generate BRDF texture
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def GenTextureBRDF(shader as Shader, size as int) as Texture2D:
+def rlGetMatrixViewOffsetStereo(eye as int) as Matrix:
 	pass
 
 // Shading begin/end functions
@@ -3218,53 +3305,6 @@ def BeginBlendMode(mode as int):
 // End blending mode (reset to default: alpha blending)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def EndBlendMode():
-	pass
-
-
-// VR control functions
-// Init VR simulator for selected device parameters
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def InitVrSimulator():
-	pass
-
-// Close VR simulator for current device
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def CloseVrSimulator():
-	pass
-
-// Update VR tracking (position and orientation) and camera
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def UpdateVrTracking(ref camera as Camera):
-	pass
-
-// Update VR tracking (position and orientation) and camera
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def UpdateVrTracking(ref camera as Camera3D):
-	pass
-	
-// Set stereo rendering configuration parameters
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def SetVrConfiguration(info as VrDeviceInfo, distortion as Shader):
-	pass
-
-// Detect if VR simulator is ready
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def IsVrSimulatorReady() as bool:
-	pass
-
-// Enable/Disable VR experience
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def ToggleVrMode():
-	pass
-
-// Begin VR simulator stereo rendering
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def BeginVrDrawing():
-	pass
-
-// End VR simulator stereo rendering
-[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def EndVrDrawing():
 	pass
 
 //------------------------------------------------------------------------------------
@@ -3577,7 +3617,6 @@ public struct DrawCall:
 	vertexAlignment as int
 	textureId as uint
 
-
 // RenderBatch type
 [StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
 public struct RenderBatch:
@@ -3587,23 +3626,6 @@ public struct RenderBatch:
 	draws as (DrawCall)
 	drawsCounter as int
 	currentDepth as single
-
-// VR Stereo rendering configuration for simulator
-[StructLayout(LayoutKind.Sequential, CharSet: CharSet.Ansi)]
-public struct VrStereoConfig:
-	distortionShader as Shader
-	
-	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
-	eyesProjection as (Matrix)
-	
-	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 2)]
-	eyesViewOffset as (Matrix)
-	
-	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
-	eyeViewportRight as (int)
-	
-	[MarshalAs(UnmanagedType.ByValArray, SizeConst: 4)]
-	eyeViewportLeft as (int)
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -3673,6 +3695,13 @@ public enum RLGL:
 	RL_LINES                        = 0x0001      // GL_LINES
 	RL_TRIANGLES                    = 0x0004      // GL_TRIANGLES
 	RL_QUADS                        = 0x0007      // GL_QUADS
+
+// Shader attribute data types
+public enum ShaderAttributeDataType:
+	SHADER_ATTRIB_FLOAT = 0
+	SHADER_ATTRIB_VEC2
+	SHADER_ATTRIB_VEC3
+	SHADER_ATTRIB_VEC4
 
 //------------------------------------------------------------------------------------
 // Functions Declaration - Matrix operations
@@ -3787,14 +3816,79 @@ def rlColor4f(r as single, g as single, b as single, a as single):
 // Functions Declaration - OpenGL equivalent functions (common to 1.1, 3.3+, ES2)
 // NOTE: This functions are used to completely abstract raylib code from OpenGL layer
 //------------------------------------------------------------------------------------
-// Enable texture usage
+// Vertex buffers state
+// Enable vertex array (VAO, if supported)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableVertexArray(vaoId as uint) as bool:
+	pass
+
+// Disable vertex array (VAO, if supported)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableVertexArray():
+	pass
+
+// Enable vertex buffer (VBO)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableVertexBuffer(id as uint):
+	pass
+
+// Disable vertex buffer (VBO)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableVertexBuffer():
+	pass
+
+// Enable vertex buffer element (VBO element)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableVertexBufferElement(id as uint):
+	pass
+
+// Disable vertex buffer element (VBO element)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableVertexBufferElement():
+	pass
+
+// Enable vertex attribute index
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableVertexAttribute(index as uint):
+	pass
+
+// Disable vertex attribute index
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableVertexAttribute(index as uint):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableStatePointer(vertexAttribType as int, buffer as IntPtr):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableStatePointer(vertexAttribType as int):
+	pass
+
+// Textures state
+// Select and active a texture slot
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlActiveTextureSlot(slot as int):
+	pass
+
+// Enable texture
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlEnableTexture(id as uint):
 	pass
 
-// Disable texture usage
+// Disable texture
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlDisableTexture():
+	pass
+
+// Enable texture cubemap
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableTextureCubemap(id as uint):
+	pass
+
+// Disable texture cubemap
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableTextureCubemap():
 	pass
 
 // Set texture parameters (filter, wrap)
@@ -3897,6 +3991,21 @@ def rlEnableSmoothLines():
 def rlDisableSmoothLines():
 	pass
 
+// Enable stereo rendering
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlEnableStereoRender():
+	pass
+
+// Disable stereo rendering
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDisableStereoRender():
+	pass
+
+// Check if stereo render is enabled
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlIsStereoRenderEnabled() as bool:
+	pass
+
 // Clear color buffer with color
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
 def rlClearColor(r as byte, g as byte, b as byte, a as byte):
@@ -3945,19 +4054,122 @@ def rlglCheckErrors():
 def rlGetVersion() as int:
 	pass
 
-// Check internal buffer overflow for a given number of vertex
+// Get default framebuffer width
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlCheckBufferLimit(vCount as int) as bool:
+def rlGetFramebufferWidth() as int:
 	pass
 
-// Set debug marker for analysis
+// Get default framebuffer height
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlSetDebugMarker(text as string):
+def rlGetFramebufferHeight() as int:
+	pass
+
+// Render batch management
+// NOTE: rlgl provides a default render batch to behave like OpenGL 1.1 immediate mode
+// but this render batch API is exposed in case of custom batches are required
+
+// Load a render batch system
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlLoadRenderBatch(numBuffers as int, bufferElements as int) as RenderBatch:
+	pass
+
+// Unload render batch system
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlUnloadRenderBatch(batch as RenderBatch):
+	pass
+
+// Draw render batch data (Update->Draw->Reset)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDrawRenderBatch(ref batch as RenderBatch):
+	pass
+
+// Set the active render batch for rlgl (NULL for default internal)
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetRenderBatchActive(ref batch as RenderBatch):
+	pass
+
+// Update and draw internal render batch
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDrawRenderBatchActive():
+	pass
+
+// Check internal buffer overflow for a given number of vertex
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlCheckRenderBatchLimit(vCount as int) as bool:
+	pass
+
+// Set current texture for render batch and check buffers limits
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetTexture(id as int):
+	pass
+
+// Vertex buffers management
+
+// Load vertex array (vao) if supported
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlLoadVertexArray() as uint:
+	pass
+
+// Load a vertex buffer attribute
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlLoadVertexBuffer(buffer as IntPtr, size as int, dynamic as bool) as uint:
+	pass
+
+// Load a new attributes element buffer
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlLoadVertexBufferElement(buffer as IntPtr, size as int, dynamic as bool) as uint:
+	pass
+
+// Update GPU buffer with new data
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlUpdateVertexBuffer(bufferId as int, data as IntPtr, dataSize as int, offset as int):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlUnloadVertexArray(vaoId as int):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlUnloadVertexBuffer(vboId as int):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetVertexAttribute(index as uint, compSize as int, type as int, normalized as bool, stride as int, pointer as IntPtr):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetVertexAttributeDivisor(index as uint, divisor as int):
+	pass
+
+// Set vertex attribute default value
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetVertexAttributeDefault(locIndex as int, value as IntPtr, attribType as int, count as int):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDrawVertexArray(offset as int, count as int):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDrawVertexArrayElements(offset as int, count as int, buffer as IntPtr):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDrawVertexArrayInstanced(offset as int, count as int, instances as int):
+	pass
+
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlDrawVertexArrayElementsInstanced(offset as int, count as int, buffer as IntPtr, instances as int):
+	pass
+
+// Set blending mode
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetBlendMode(mode as int):
 	pass
 
 // Set blending mode factor and equation (using OpenGL factors)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlSetBlendMode(glSrcFactor as int, glDstFactor as int, glEquation as int):
+def rlSetBlendFactors(glSrcFactor as int, glDstFactor as int, glEquation as int):
 	pass
 
 // Load OpenGL extensions
@@ -4037,35 +4249,56 @@ def rlFramebufferComplete(id as uint) as bool:
 def rlUnloadFramebuffer(id as uint):
 	pass
 
-// Vertex data management
-// Upload vertex data into GPU and provided VAO/VBO ids
+// Shaders management
+
+// Load shader from code strings
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlLoadMesh(ref mesh as Mesh, dynamic as bool):
+def rlLoadShaderCode(vsCode as string, fsCode as string) as uint:
 	pass
 
-// Update vertex or index data on GPU (upload new data to one buffer)
+// Compile custom shader and return shader id (type: GL_VERTEX_SHADER, GL_FRAGMENT_SHADER)
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlUpdateMesh(mesh as Mesh, buffer as int, count as int):
+def rlCompileShader(shaderCode as string, type as int) as uint:
 	pass
 
-// Update vertex or index data on GPU, at index
+// Load custom shader program
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlUpdateMeshAt(mesh as Mesh, buffer as int, count as int, index as int):
+def rlLoadShaderProgram(vShaderId as uint, fShaderId as uint) as uint:
 	pass
 
-// Draw a 3d mesh with material and transform
+// Unload shader program
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDrawMesh(mesh as Mesh, material as Material, transform as Matrix):
+def rlUnloadShaderProgram(id as int):
 	pass
 
-// Draw a 3d mesh with material and transform
+// Get shader location uniform
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlDrawMeshInstanced(mesh as Mesh, material as Material, transforms as (Matrix), count as int):
+def rlGetLocationUniform(shaderId as uint, uniformName as string) as int:
 	pass
-	
-// Unload mesh data from CPU and GPU
+
+// Get shader location attribute
 [DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
-def rlUnloadMesh(mesh as Mesh):
+def rlGetLocationAttrib(shaderId as uint, attribName as string) as int:
+	pass
+
+// Set shader value uniform
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetUniform(locIndex as int, value as IntPtr, uniformType as int, count as int):
+	pass
+
+// Set shader value matrix
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetUniformMatrix(locIndex as int, mat as Matrix):
+	pass
+
+// Set shader value sampler
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetUniformSampler(locIndex as int, textureId as int):
+	pass
+
+// Set shader currently active
+[DllImport("raylib", CallingConvention: CallingConvention.Cdecl)]
+def rlSetShader(shader as Shader):
 	pass
 
 //------------------------------------------------------------------------------------

@@ -19,7 +19,6 @@
 *   Copyright (c) 2013-2020 Ramon Santamaria (@raysan5)
 *
 ********************************************************************************************/
-
 import raylib_boo
 
 // Initialization
